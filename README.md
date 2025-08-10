@@ -1,4 +1,4 @@
-# Cool Cat Resort - Backoffice
+# Cool Cat Resort Admin Portal
 
 A modern backoffice web application built with Next.js, Material-UI, TanStack Table, and Zod for managing Cool Cat Resort operations.
 
