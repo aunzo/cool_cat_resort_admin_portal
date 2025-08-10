@@ -1,8 +1,9 @@
 {
   "/not-found": "app/not-found.js",
-  "/rooms/page": "app/rooms/page.js",
-  "/reservations/page": "app/reservations/page.js",
   "/page": "app/page.js",
+  "/users/page": "app/users/page.js",
+  "/reservations/page": "app/reservations/page.js",
+  "/rooms/page": "app/rooms/page.js",
   "/api/rooms/route": "app/api/rooms/route.js",
   "/api/users/route": "app/api/users/route.js",
   "/api/reservations/route": "app/api/reservations/route.js"
