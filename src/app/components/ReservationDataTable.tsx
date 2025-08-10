@@ -169,7 +169,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
               <Tooltip title="แก้ไข">
                 <IconButton
                   size="small"
-                  color="secondary"
+                  color="primary"
                   onClick={() => handleEditReservation(reservation)}
                 >
                   <Edit fontSize="small" />

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
+  Paper,
   Typography,
   TextField,
   Button,
@@ -294,22 +295,30 @@ export default function ReservationForm({ reservationHook, editingReservation, o
 
   return (
     <Box>
-        <Typography 
-          variant={isMobile ? "h5" : "h4"} 
-          component="h2" 
-          gutterBottom
+      {!isMobile ? (
+        <Paper 
+          elevation={3} 
           sx={{ 
-            fontWeight: 'bold',
-            color: theme.palette.primary.main,
-            textAlign: 'center',
+            p: 3, 
             mb: 3
           }}
         >
-{isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
-        </Typography>
+          <Typography 
+            variant="h4" 
+            component="h2" 
+            gutterBottom
+            sx={{ 
+              fontWeight: 'bold',
+              color: theme.palette.primary.main,
+              textAlign: 'center',
+              mb: 3
+            }}
+          >
+  {isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
+          </Typography>
         
         <Box component="form" onSubmit={handleSubmit}>
-          <Grid container spacing={isMobile ? 2 : 3}>
+          <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                 <Autocomplete
@@ -482,6 +491,199 @@ export default function ReservationForm({ reservationHook, editingReservation, o
             </Button>
           </Box>
         </Box>
+      </Paper>
+      ) : (
+        <Box>
+          <Typography 
+            variant="h5" 
+            component="h2" 
+            gutterBottom
+            sx={{ 
+              fontWeight: 'bold',
+              color: theme.palette.primary.main,
+              textAlign: 'center',
+              mb: 3
+            }}
+          >
+  {isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
+          </Typography>
+          
+          <Box component="form" onSubmit={handleSubmit}>
+             <Grid container spacing={2}>
+               <Grid item xs={12}>
+                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                   <Autocomplete
+                     fullWidth
+                     options={users}
+                     getOptionLabel={(option) => `${option.name} - ${option.taxId}`}
+                     value={selectedUser}
+                     onChange={handleUserChange}
+                     inputValue={userSearchValue}
+                     onInputChange={(event, newInputValue) => {
+                       setUserSearchValue(newInputValue)
+                     }}
+                     renderInput={(params) => (
+                       <TextField
+                         {...params}
+                         label="ค้นหาลูกค้า"
+                         error={!!errors.userId}
+                         helperText={errors.userId}
+                         placeholder="พิมพ์เพื่อค้นหาลูกค้า..."
+                       />
+                     )}
+                     renderOption={(props, option) => (
+                       <Box component="li" {...props} key={option.id}>
+                         <Box>
+                           <Typography variant="body1">{option.name}</Typography>
+                           <Typography variant="caption" color="text.secondary">
+                             Tax ID: {option.taxId} | Address: {option.address}
+                           </Typography>
+                         </Box>
+                       </Box>
+                     )}
+                     noOptionsText="ไม่พบลูกค้า"
+                   />
+                   <IconButton
+                     onClick={() => setOpenUserDialog(true)}
+                     sx={{ 
+                       mt: 1,
+                       bgcolor: 'primary.main',
+                       color: 'white',
+                       '&:hover': {
+                         bgcolor: 'primary.dark'
+                       }
+                     }}
+                     size="small"
+                   >
+                     <AddIcon />
+                   </IconButton>
+                 </Box>
+               </Grid>
+               
+               <Grid item xs={12}>
+                 <Autocomplete
+                     multiple
+                     options={rooms}
+                     getOptionLabel={(option) => `${option.name} - $${option.price}/คืน`}
+                     value={selectedRooms}
+                     onChange={(event, newValue) => {
+                       setSelectedRooms(newValue)
+                       setFormData(prev => ({ ...prev, roomIds: newValue.map(room => room.id!) }))
+                       
+                       // Clear error for roomIds field
+                       if (errors.roomIds) {
+                         setErrors(prev => ({ ...prev, roomIds: '' }))
+                       }
+                     }}
+                   renderInput={(params) => (
+                     <TextField
+                       {...params}
+                       label="เลือกห้องพัก"
+                       error={!!errors.roomIds}
+                       helperText={errors.roomIds}
+                       placeholder="เลือกหนึ่งห้องหรือมากกว่า..."
+                     />
+                   )}
+                   renderOption={(props, option) => (
+                     <Box component="li" {...props} key={option.id}>
+                       <Box>
+                         <Typography variant="body1">{option.name}</Typography>
+                         <Typography variant="caption" color="text.secondary">
+                           ${option.price}/คืน
+                         </Typography>
+                       </Box>
+                     </Box>
+                   )}
+                 />
+               </Grid>
+               
+               <Grid item xs={12}>
+                 <TextField
+                   fullWidth
+                   type="date"
+                   label="วันที่เช็คอิน"
+                   value={formatDateForInput(formData.checkInDate || new Date())}
+                   onChange={handleChange('checkInDate')}
+                   error={!!errors.checkInDate}
+                   helperText={errors.checkInDate}
+                   InputLabelProps={{ shrink: true }}
+                 />
+               </Grid>
+               
+               <Grid item xs={12}>
+                 <TextField
+                   fullWidth
+                   type="date"
+                   label="วันที่เช็คเอาท์"
+                   value={formatDateForInput(formData.checkOutDate || new Date())}
+                   onChange={handleChange('checkOutDate')}
+                   error={!!errors.checkOutDate}
+                   helperText={errors.checkOutDate}
+                   InputLabelProps={{ shrink: true }}
+                 />
+               </Grid>
+               
+               <Grid item xs={12}>
+                 <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                   <Typography variant="h6" color="primary" gutterBottom>
+                     จำนวนเงินรวม: ${calculateTotalAmount().toFixed(2)}
+                   </Typography>
+                   <Typography variant="body2" color="text.secondary">
+                     {selectedRooms.length > 0 && formData.checkInDate && formData.checkOutDate
+                       ? `${selectedRooms.length} ห้อง × ${calculateDays()} วัน${formData.extraBed ? ' + เตียงเสริม ฿100/วัน' : ''}`
+                       : 'เลือกห้องและวันที่เพื่อคำนวณยอดรวม'}
+                   </Typography>
+                 </Box>
+               </Grid>
+               
+               <Grid item xs={12}>
+                 <FormControlLabel
+                   control={
+                     <Checkbox
+                       checked={formData.extraBed}
+                       onChange={handleCheckboxChange('extraBed')}
+                       color="primary"
+                     />
+                   }
+                   label="เตียงเสริม (+฿100/วัน)"
+                   sx={{ mt: 1 }}
+                 />
+               </Grid>
+             </Grid>
+             
+             {submitError && (
+               <Alert severity="error" sx={{ mt: 2 }}>
+                 {submitError}
+               </Alert>
+             )}
+             
+             {submitSuccess && (
+               <Alert severity="success" sx={{ mt: 2 }}>
+{isEditing ? 'อัปเดตการจองสำเร็จแล้ว!' : 'สร้างการจองสำเร็จแล้ว!'}
+               </Alert>
+             )}
+             
+             <Box sx={{ mt: 3, textAlign: 'center' }}>
+               <Button
+                 type="submit"
+                 variant="contained"
+                 size="large"
+                 disabled={isSubmitting}
+                 sx={{ flex: 1 }}
+               >
+                 {isSubmitting ? (
+                   <>
+                     <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                     {isEditing ? 'กำลังอัปเดต...' : 'กำลังสร้าง...'}
+                   </>
+                 ) : (
+                   isEditing ? 'อัปเดตการจอง' : 'สร้างการจอง'
+                 )}
+               </Button>
+             </Box>
+           </Box>
+        </Box>
+      )}
 
       {/* New User Dialog */}
       <Dialog 
