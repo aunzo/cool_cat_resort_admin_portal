@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
-  Paper,
   Typography,
   TextField,
   Button,
@@ -295,13 +294,6 @@ export default function ReservationForm({ reservationHook, editingReservation, o
 
   return (
     <Box>
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: isMobile ? 2 : 3, 
-          mb: 3
-        }}
-      >
         <Typography 
           variant={isMobile ? "h5" : "h4"} 
           component="h2" 
@@ -457,19 +449,6 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 sx={{ mt: 1 }}
               />
             </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label="หมายเหตุ (ไม่บังคับ)"
-                value={formData.notes || ''}
-                onChange={handleChange('notes')}
-                error={!!errors.notes}
-                helperText={errors.notes}
-              />
-            </Grid>
           </Grid>
           
           {submitError && (
@@ -503,7 +482,6 @@ export default function ReservationForm({ reservationHook, editingReservation, o
             </Button>
           </Box>
         </Box>
-      </Paper>
 
       {/* New User Dialog */}
       <Dialog 
