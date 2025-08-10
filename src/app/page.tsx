@@ -21,6 +21,10 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import {
   AttachMoney,
@@ -40,7 +44,8 @@ import { useReservations } from '@/hooks/useReservations'
 import { useRooms } from '@/hooks/useRooms'
 import { useUsers } from '@/hooks/useUsers'
 import { ReservationWithDetails } from '@/types/reservation'
-import { isSameDay, parseISO } from 'date-fns'
+import { isSameDay, parseISO, format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts'
 
 export default function HomePage() {
   const { reservationsWithDetails, loading: reservationsLoading } = useReservations()
@@ -51,6 +56,9 @@ export default function HomePage() {
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null)
   const [modalOpen, setModalOpen] = React.useState(false)
   const [selectedDateReservations, setSelectedDateReservations] = React.useState<ReservationWithDetails[]>([])
+  
+  // Chart filter state
+  const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear())
 
   // Calculate dashboard metrics
   const totalReservations = reservationsWithDetails.length
@@ -76,6 +84,52 @@ export default function HomePage() {
       day: 'numeric'
     })
   }
+
+  // Prepare chart data for the selected year
+  const getChartData = () => {
+    const months = eachMonthOfInterval({
+      start: new Date(selectedYear, 0, 1), // January 1st of selected year
+      end: new Date(selectedYear, 11, 31)  // December 31st of selected year
+    })
+
+    return months.map(month => {
+      const monthStart = startOfMonth(month)
+      const monthEnd = endOfMonth(month)
+      
+      const monthReservations = reservationsWithDetails.filter(reservation => {
+        const createdDate = new Date(reservation.createdAt || '')
+        return createdDate >= monthStart && createdDate <= monthEnd
+      })
+
+      const monthRevenue = monthReservations.reduce((sum, reservation) => sum + (reservation.totalAmount || 0), 0)
+
+      return {
+        month: format(month, 'MMM', { locale: undefined }),
+        reservations: monthReservations.length,
+        revenue: monthRevenue
+      }
+    })
+  }
+
+  const chartData = getChartData()
+  
+  // Get available years from reservations
+  const getAvailableYears = () => {
+    const years = new Set<number>()
+    reservationsWithDetails.forEach(reservation => {
+      if (reservation.createdAt) {
+        years.add(new Date(reservation.createdAt).getFullYear())
+      }
+    })
+    const yearArray = Array.from(years).sort((a, b) => b - a)
+    // Add current year if not present
+    if (!yearArray.includes(new Date().getFullYear())) {
+      yearArray.unshift(new Date().getFullYear())
+    }
+    return yearArray
+  }
+
+  const availableYears = getAvailableYears()
   
   // Handle calendar day click
   const handleDayClick = (date: Date) => {
@@ -232,6 +286,76 @@ export default function HomePage() {
                   <Typography variant="body1">ลูกค้าทั้งหมด</Typography>
                 </CardContent>
               </Card>
+            </Grid>
+          </Grid>
+
+          {/* Charts Section */}
+          <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              สถิติการจอง
+            </Typography>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>ปี</InputLabel>
+              <Select
+                value={selectedYear}
+                label="ปี"
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+              >
+                {availableYears.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} lg={6}>
+              <Paper elevation={3} sx={{ p: 3, height: 400 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main', mb: 3 }}>
+                  แนวโน้มการจอง ({selectedYear})
+                </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="reservations" 
+                      stroke="#8884d8" 
+                      strokeWidth={2}
+                      name="จำนวนการจอง"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} lg={6}>
+               <Paper elevation={3} sx={{ p: 3, height: 400 }}>
+                 <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main', mb: 3 }}>
+                   รายได้ ({selectedYear})
+                 </Typography>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis tickFormatter={(value) => `฿${(value / 1000).toFixed(0)}K`} />
+                    <RechartsTooltip 
+                      formatter={(value) => [`฿${Number(value).toLocaleString()}`, 'รายได้']}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="revenue" 
+                      fill="#82ca9d" 
+                      name="รายได้ (บาท)"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Paper>
             </Grid>
           </Grid>
 
