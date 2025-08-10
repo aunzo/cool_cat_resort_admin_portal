@@ -1,5 +1,14 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useMemo, useState } from 'react'
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  ColumnDef,
+  flexRender,
+} from '@tanstack/react-table'
 import {
   Box,
   Table,
@@ -16,7 +25,6 @@ import {
   Card,
   CardContent,
   Stack,
-  Pagination,
   IconButton,
   Button,
   Dialog,
@@ -25,6 +33,7 @@ import {
   DialogActions,
   useTheme,
   useMediaQuery,
+  Tooltip,
 } from '@mui/material'
 import {
   Edit as EditIcon,
@@ -46,30 +55,12 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
   const [roomToDelete, setRoomToDelete] = useState<Room | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
-  const [page, setPage] = useState(1)
-  const [rowsPerPage] = useState(10)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const fallbackHook = useRooms()
   const { rooms, loading, error } = roomHook || fallbackHook
 
-  // Filter rooms based on search
-  const filteredRooms = rooms.filter(room => 
-    room.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
-    (room.id && room.id.toLowerCase().includes(globalFilter.toLowerCase()))
-  )
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredRooms.length / rowsPerPage)
-  const startIndex = (page - 1) * rowsPerPage
-  const endIndex = startIndex + rowsPerPage
-  const paginatedRooms = filteredRooms.slice(startIndex, endIndex)
-
-  // Reset page when filter changes
-  useEffect(() => {
-    setPage(1)
-  }, [globalFilter])
-
+  // Handler functions for actions
   const handleEdit = (room: Room) => {
     setEditingRoom(room)
   }
@@ -102,6 +93,80 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
     setDeleteConfirmOpen(false)
     setRoomToDelete(null)
   }
+
+  // TanStack Table columns definition
+  const columns = useMemo<ColumnDef<Room>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'ชื่อห้อง',
+        cell: (info) => (
+          <Typography variant="body2" fontWeight="medium">
+            {info.getValue() as string}
+          </Typography>
+        ),
+      },
+      {
+        accessorKey: 'price',
+        header: 'ราคา',
+        cell: (info) => (
+          <Typography variant="body2" fontWeight="bold" color="primary">
+            ฿{(info.getValue() as number).toFixed(2)}
+          </Typography>
+        ),
+      },
+      {
+        id: 'actions',
+        header: 'การดำเนินการ',
+        cell: (info) => {
+          const room = info.row.original
+          return (
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Tooltip title="แก้ไข">
+                <IconButton
+                  size="small"
+                  onClick={() => handleEdit(room)}
+                  color="primary"
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="ลบ">
+                <IconButton
+                  size="small"
+                  onClick={() => handleDeleteClick(room)}
+                  color="error"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )
+        },
+      },
+    ],
+    []
+  )
+
+  // TanStack Table configuration
+  const table = useReactTable({
+    data: rooms,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: 'includesString',
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
+  })
 
   if (loading) {
     return (
@@ -136,7 +201,7 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
         sx={{ mb: 2 }}
         size="small"
       />
-      {filteredRooms.length === 0 ? (
+      {table.getRowModel().rows.length === 0 ? (
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
             {rooms.length === 0 ? 'ไม่พบห้องพัก เพิ่มห้องพักแรกด้านบน' : 'ไม่พบห้องพักที่ตรงกับการค้นหา'}
@@ -144,53 +209,82 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
         </Box>
       ) : (
         <>
-          {paginatedRooms.map((room) => (
-            <Card key={room.id} sx={{ mb: 2 }}>
-              <CardContent>
-                <Stack spacing={1}>
-                  <Typography variant="h6" component="div">
-                    {room.name}
-                  </Typography>
-
-                  <Typography variant="body1" fontWeight="bold" color="primary">
-                    ฿{room.price.toFixed(2)}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleEdit(room)}
-                      color="primary"
-                      startIcon={<EditIcon />}
-                    >
-                      แก้ไข
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleDeleteClick(room)}
-                      color="error"
-                      startIcon={<DeleteIcon />}
-                    >
-                      ลบ
-                    </Button>
-                  </Box>
-                </Stack>
-              </CardContent>
-            </Card>
-          ))}
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 3, gap: 2 }}>
+          {table.getRowModel().rows.map((row) => {
+            const room = row.original
+            return (
+              <Card key={room.id} sx={{ mb: 2 }}>
+                <CardContent>
+                  <Stack spacing={1}>
+                    <Typography variant="h6" component="div">
+                      {room.name}
+                    </Typography>
+                    <Typography variant="body1" fontWeight="bold" color="primary">
+                      ฿{room.price.toFixed(2)}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleEdit(room)}
+                        color="primary"
+                        startIcon={<EditIcon />}
+                      >
+                        แก้ไข
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleDeleteClick(room)}
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                      >
+                        ลบ
+                      </Button>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )
+          })}
+          {table.getPageCount() > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>>'}
+                </Button>
+              </Box>
               <Typography variant="body2" color="text.secondary">
-                หน้า {page} จาก {totalPages}
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
               </Typography>
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={(_, newPage) => setPage(newPage)}
-                color="primary"
-                size="medium"
-              />
             </Box>
           )}
         </>
@@ -211,14 +305,11 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
           size="small"
         />
         <Typography variant="body2" color="text.secondary">
-          {filteredRooms.length > 0 
-            ? `แสดง ${startIndex + 1} ถึง ${Math.min(endIndex, filteredRooms.length)} จาก ${filteredRooms.length} ห้องพัก`
-            : `${filteredRooms.length} ห้องพัก`
-          }
+          {table.getFilteredRowModel().rows.length} ห้องพัก
         </Typography>
       </Box>
       
-      {filteredRooms.length === 0 ? (
+      {table.getRowModel().rows.length === 0 ? (
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
             {rooms.length === 0 ? 'ไม่พบห้องพัก เพิ่มห้องพักแรกด้านบน' : 'ไม่พบห้องพักที่ตรงกับการค้นหา'}
@@ -229,55 +320,86 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
           <TableContainer component={Paper} elevation={1}>
             <Table>
               <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 600, backgroundColor: 'grey.50' }}>ชื่อห้อง</TableCell>
-                  <TableCell sx={{ fontWeight: 600, backgroundColor: 'grey.50' }}>ราคา</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600, backgroundColor: 'grey.50' }}>การดำเนินการ</TableCell>
-                </TableRow>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableCell
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        sx={{
+                          cursor: header.column.getCanSort() ? 'pointer' : 'default',
+                          userSelect: 'none',
+                          fontWeight: 600,
+                          backgroundColor: 'grey.50',
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                        {{
+                          asc: ' 🔼',
+                          desc: ' 🔽',
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
               </TableHead>
               <TableBody>
-                {paginatedRooms.map((room) => (
-                  <TableRow key={room.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        {room.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="bold" color="primary">
-                        ฿{room.price.toFixed(2)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEdit(room)}
-                        color="primary"
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteClick(room)}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} hover>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={(_, newPage) => setPage(newPage)}
-                color="primary"
-                size="large"
-              />
+          {table.getPageCount() > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>>'}
+                </Button>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+              </Typography>
             </Box>
           )}
         </>

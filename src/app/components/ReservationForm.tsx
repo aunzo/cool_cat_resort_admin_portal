@@ -313,7 +313,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
             mb: 3
           }}
         >
-{isEditing ? 'แก้ไขการจอง' : 'สร้างการจองใหม่'}
+{isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
         </Typography>
         
         <Box component="form" onSubmit={handleSubmit}>

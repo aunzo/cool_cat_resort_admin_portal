@@ -9,8 +9,11 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material'
-import { User, CreateUserData } from '@/types/user'
+import { User, CreateUserData, UserFormSchema } from '@/types/user'
 import { useUsers } from '@/hooks/useUsers'
+import { z } from 'zod'
+
+type UserFormData = z.infer<typeof UserFormSchema>
 
 interface UserFormProps {
   userHook: ReturnType<typeof useUsers>
@@ -19,13 +22,14 @@ interface UserFormProps {
 }
 
 export default function UserForm({ userHook, editingUser, onEditComplete }: UserFormProps) {
-  const [formData, setFormData] = useState<CreateUserData>({
+  const [formData, setFormData] = useState<UserFormData>({
     name: '',
     address: '',
     taxId: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof UserFormData, string>>>({})
 
   useEffect(() => {
     if (editingUser) {
@@ -43,7 +47,7 @@ export default function UserForm({ userHook, editingUser, onEditComplete }: User
     }
   }, [editingUser])
 
-  const handleInputChange = (field: keyof CreateUserData) => (
+  const handleInputChange = (field: keyof UserFormData) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setFormData(prev => ({
@@ -51,13 +55,37 @@ export default function UserForm({ userHook, editingUser, onEditComplete }: User
       [field]: event.target.value,
     }))
     setFormError(null)
+    // Clear field-specific error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+  }
+
+  const validateForm = (): boolean => {
+    try {
+      UserFormSchema.parse(formData)
+      setFieldErrors({})
+      return true
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Partial<Record<keyof UserFormData, string>> = {}
+        error.errors.forEach((err) => {
+          if (err.path.length > 0) {
+            const field = err.path[0] as keyof UserFormData
+            errors[field] = err.message
+          }
+        })
+        setFieldErrors(errors)
+      }
+      return false
+    }
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     
-    if (!formData.name.trim() || !formData.address.trim() || !formData.taxId.trim()) {
-      setFormError('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน')
+    if (!validateForm()) {
+      setFormError('กรุณาแก้ไขข้อผิดพลาดในแบบฟอร์ม')
       return
     }
 
@@ -97,6 +125,7 @@ export default function UserForm({ userHook, editingUser, onEditComplete }: User
       })
     }
     setFormError(null)
+    setFieldErrors({})
   }
 
   return (
@@ -125,6 +154,8 @@ export default function UserForm({ userHook, editingUser, onEditComplete }: User
           required
           fullWidth
           disabled={isSubmitting}
+          error={!!fieldErrors.name}
+          helperText={fieldErrors.name}
         />
         
         <TextField
@@ -136,6 +167,8 @@ export default function UserForm({ userHook, editingUser, onEditComplete }: User
           multiline
           rows={3}
           disabled={isSubmitting}
+          error={!!fieldErrors.address}
+          helperText={fieldErrors.address}
         />
         
         <TextField
@@ -145,6 +178,8 @@ export default function UserForm({ userHook, editingUser, onEditComplete }: User
           required
           fullWidth
           disabled={isSubmitting}
+          error={!!fieldErrors.taxId}
+          helperText={fieldErrors.taxId}
         />
         
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
