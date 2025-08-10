@@ -219,34 +219,51 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
           {table.getRowModel().rows.map((row) => {
             const user = row.original
             return (
-              <Card key={user.id} sx={{ mb: 2 }}>
-                <CardContent>
-                  <Stack spacing={1}>
-                    <Typography variant="h6" component="div">
+              <Card key={user.id} sx={{ mb: 2, borderRadius: 2 }}>
+                <CardContent sx={{ pb: 2 }}>
+                  <Stack spacing={2}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
                       {user.name}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>ที่อยู่:</strong> {user.address}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>เลขประจำตัวผู้เสียภาษี:</strong> {user.taxId}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Stack spacing={1}>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>ที่อยู่:</strong> {user.address}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>เลขประจำตัวผู้เสียภาษี:</strong> {user.taxId}
+                      </Typography>
+                    </Stack>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 2, 
+                      mt: 2,
+                      justifyContent: 'flex-end'
+                    }}>
                       <Button
-                        size="small"
+                        size="medium"
                         variant="outlined"
                         onClick={() => handleEdit(user)}
                         color="primary"
                         startIcon={<EditIcon />}
+                        sx={{ 
+                          minHeight: 44,
+                          px: 3,
+                          borderRadius: 2
+                        }}
                       >
                         แก้ไข
                       </Button>
                       <Button
-                        size="small"
+                        size="medium"
                         variant="outlined"
                         onClick={() => handleDeleteClick(user)}
                         color="error"
                         startIcon={<DeleteIcon />}
+                        sx={{ 
+                          minHeight: 44,
+                          px: 3,
+                          borderRadius: 2
+                        }}
                       >
                         ลบ
                       </Button>
@@ -257,44 +274,58 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
             )
           })}
           {table.getPageCount() > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ mt: 3 }}>
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                textAlign="center"
+                sx={{ mb: 2 }}
+              >
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+              </Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                gap: 2,
+                flexWrap: 'wrap'
+              }}>
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   onClick={() => table.setPageIndex(0)}
                   disabled={!table.getCanPreviousPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
                 >
                   {'<<'}
                 </Button>
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
                 >
                   {'<'}
                 </Button>
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
                 >
                   {'>'}
                 </Button>
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
                 >
                   {'>>'}
                 </Button>
               </Box>
-              <Typography variant="body2" color="text.secondary">
-                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
-              </Typography>
             </Box>
           )}
         </>
