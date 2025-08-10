@@ -2,9 +2,13 @@
 import React from 'react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
-import { Button, Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { PictureAsPdf } from '@mui/icons-material'
 import { ReservationWithDetails } from '@/types/reservation'
+import {
+  useTheme,
+  useMediaQuery,
+  Button
+} from '@mui/material'
 
 interface PDFExportProps {
   reservation: ReservationWithDetails
@@ -12,6 +16,9 @@ interface PDFExportProps {
 }
 
 const PDFExport: React.FC<PDFExportProps> = ({ reservation, onExport }) => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
   const generatePDF = async () => {
     try {
       // Create a temporary div for the invoice content
@@ -152,18 +159,17 @@ const PDFExport: React.FC<PDFExportProps> = ({ reservation, onExport }) => {
           </div>
         </div>
         
-        <table style="width: 100%; border-collapse: collapse; border-spacing: 0; margin-bottom: 20px; font-family: 'Sarabun'; font-size: 10px;">
+        <table style="width: 100%; border-collapse: collapse; border-spacing: 0; margin-bottom: 20px; font-family: 'Sarabun'; font-size: 10px; table-layout: fixed;">
           <thead>
             <tr style="background-color: #f5f5f5;">
-              <th style="border-left: 1px solid #333; border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 40px; white-space: nowrap;">ที่</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 120px; white-space: nowrap;">รายการ</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; white-space: nowrap;">วันที่เข้า</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; white-space: nowrap;">วันที่ออก</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; white-space: nowrap;">ประเภทห้อง</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 60px; white-space: nowrap;">จำนวนคืน</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; white-space: nowrap;">ราคาต่อคืน</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; white-space: nowrap;">จำนวนเงิน</th>
-               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 60px; white-space: nowrap;">หมายเหตุ</th>
+              <th style="border-left: 1px solid #333; border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 8%; white-space: nowrap;">ที่</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 18%; white-space: nowrap;">รายการ</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; white-space: nowrap;">วันที่เข้า</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; white-space: nowrap;">วันที่ออก</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 16%; white-space: nowrap;">ประเภทห้อง</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; white-space: nowrap;">จำนวนคืน</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; white-space: nowrap;">ราคาต่อคืน</th>
+               <th style="border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; white-space: nowrap;">จำนวนเงิน</th>
             </tr>
           </thead>
           <tbody>
@@ -173,71 +179,67 @@ const PDFExport: React.FC<PDFExportProps> = ({ reservation, onExport }) => {
                   const roomAmount = roomPrice * totalDays
                   return `
                     <tr style="height: 30px;">
-                      <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 40px; height: 30px; white-space: nowrap;">${index + 1}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 120px; height: 30px; white-space: nowrap;">ค่าที่พัก</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;">${checkIn.getDate()} ${getThaiMonth(checkIn.getMonth() + 1)} ${checkIn.getFullYear() + 543}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;">${checkOut.getDate()} ${getThaiMonth(checkOut.getMonth() + 1)} ${checkOut.getFullYear() + 543}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 80px; height: 30px; white-space: nowrap;">${room.room?.name || 'ห้องพัก'}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 60px; height: 30px; white-space: nowrap;">${totalDays}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;">${roomPrice.toFixed(2)}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;">${roomAmount.toFixed(2)}</td>
-                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 60px; height: 30px; white-space: nowrap;"></td>
+                      <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 8%; height: 30px; white-space: nowrap;">${index + 1}</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 18%; height: 30px; white-space: nowrap;">ค่าที่พัก</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;">${checkIn.getDate()} ${getThaiMonth(checkIn.getMonth() + 1)} ${checkIn.getFullYear() + 543}</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;">${checkOut.getDate()} ${getThaiMonth(checkOut.getMonth() + 1)} ${checkOut.getFullYear() + 543}</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 16%; height: 30px; white-space: nowrap;">${room.room?.name || 'ห้องพัก'}</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; height: 30px; white-space: nowrap;">${totalDays}</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;">${roomPrice.toFixed(2)}</td>
+                      <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;">${roomAmount.toFixed(2)}</td>
                     </tr>
                   `
                 }).join('')
               : `
                 <tr style="height: 30px;">
-                  <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 40px; height: 30px; white-space: nowrap;">1</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 120px; height: 30px; white-space: nowrap;">ค่าที่พัก</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;">${checkIn.getDate()} ${getThaiMonth(checkIn.getMonth() + 1)} ${checkIn.getFullYear() + 543}</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;">${checkOut.getDate()} ${getThaiMonth(checkOut.getMonth() + 1)} ${checkOut.getFullYear() + 543}</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 80px; height: 30px; white-space: nowrap;">ห้องพัก</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 60px; height: 30px; white-space: nowrap;">${totalDays}</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;">${(reservation.totalAmount / totalDays).toFixed(2)}</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;">${reservation.totalAmount.toFixed(2)}</td>
-                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 60px; height: 30px; white-space: nowrap;"></td>
+                  <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 8%; height: 30px; white-space: nowrap;">1</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 18%; height: 30px; white-space: nowrap;">ค่าที่พัก</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;">${checkIn.getDate()} ${getThaiMonth(checkIn.getMonth() + 1)} ${checkIn.getFullYear() + 543}</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;">${checkOut.getDate()} ${getThaiMonth(checkOut.getMonth() + 1)} ${checkOut.getFullYear() + 543}</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 16%; height: 30px; white-space: nowrap;">ห้องพัก</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; height: 30px; white-space: nowrap;">${totalDays}</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;">${(reservation.totalAmount / totalDays).toFixed(2)}</td>
+                  <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;">${reservation.totalAmount.toFixed(2)}</td>
                 </tr>
               `
             }
             ${Array.from({ length: Math.max(0, 4 - (reservation.rooms?.length || 1)) }, (_, i) => `
               <tr style="height: 30px;">
-                <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; width: 40px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 120px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 80px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 60px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;"></td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 60px; height: 30px; white-space: nowrap;"></td>
+                <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; width: 8%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 18%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 16%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;"></td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;"></td>
               </tr>
             `).join('')}
             ${reservation.extraBed ? `
               <tr style="height: 30px;">
-                <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 40px; height: 30px; white-space: nowrap;">${(reservation.rooms?.length || 0) + 1}</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 120px; height: 30px; white-space: nowrap;">เตียงเสริม</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;">${checkIn.getDate()} ${getThaiMonth(checkIn.getMonth() + 1)} ${checkIn.getFullYear() + 543}</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 80px; height: 30px; white-space: nowrap;">${checkOut.getDate()} ${getThaiMonth(checkOut.getMonth() + 1)} ${checkOut.getFullYear() + 543}</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 80px; height: 30px; white-space: nowrap;">เตียงเสริม</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 60px; height: 30px; white-space: nowrap;">${totalDays}</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;">100.00</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 80px; height: 30px; white-space: nowrap;">${(100 * totalDays).toFixed(2)}</td>
-                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 60px; height: 30px; white-space: nowrap;"></td>
+                <td style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 8%; height: 30px; white-space: nowrap;">${(reservation.rooms?.length || 0) + 1}</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 18%; height: 30px; white-space: nowrap;">เตียงเสริม</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;">${checkIn.getDate()} ${getThaiMonth(checkIn.getMonth() + 1)} ${checkIn.getFullYear() + 543}</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 14%; height: 30px; white-space: nowrap;">${checkOut.getDate()} ${getThaiMonth(checkOut.getMonth() + 1)} ${checkOut.getFullYear() + 543}</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 16%; height: 30px; white-space: nowrap;">เตียงเสริม</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; width: 10%; height: 30px; white-space: nowrap;">${totalDays}</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;">100.00</td>
+                <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; width: 10%; height: 30px; white-space: nowrap;">${(100 * totalDays).toFixed(2)}</td>
               </tr>
             ` : ''}
              <tr style="background-color: #f0f0f0; font-weight: bold; height: 30px;">
                <td colspan="6" style="border-left: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: center; height: 30px; white-space: nowrap;">${numberToThaiText(reservation.rooms && reservation.rooms.length > 0 
                  ? reservation.rooms.reduce((total, room) => total + ((room.room?.price || 0) * totalDays), 0) + (reservation.extraBed ? 100 * totalDays : 0)
                  : reservation.totalAmount)}</td>
-               <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 80px; height: 30px; white-space: nowrap;">รวมเงิน</td>
-               <td colspan="2" style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; height: 30px; white-space: nowrap;">${reservation.rooms && reservation.rooms.length > 0 
+               <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: left; width: 10%; height: 30px; white-space: nowrap;">รวมเงิน</td>
+               <td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 4px; text-align: right; height: 30px; white-space: nowrap;">${reservation.rooms && reservation.rooms.length > 0 
                  ? (reservation.rooms.reduce((total, room) => total + ((room.room?.price || 0) * totalDays), 0) + (reservation.extraBed ? 100 * totalDays : 0)).toFixed(2)
                  : reservation.totalAmount.toFixed(2)}</td>
              </tr>
           </tbody>
         </table>
         
-        <div style="text-align: center; margin-top: 100px; font-family: 'Sarabun';">
+        <div style="text-align: center; margin-top: 60px; font-family: 'Sarabun';">
           <div style="font-weight: bold;">ผู้รับเงิน</div>
           <div style="margin-top: 4px;">${formatThaiDate(new Date())}</div>
         </div>
@@ -300,6 +302,7 @@ const PDFExport: React.FC<PDFExportProps> = ({ reservation, onExport }) => {
       color="primary"
       startIcon={<PictureAsPdf />}
       onClick={generatePDF}
+      fullWidth={isMobile}
       sx={{
         borderRadius: 2,
         textTransform: 'none',
@@ -307,8 +310,9 @@ const PDFExport: React.FC<PDFExportProps> = ({ reservation, onExport }) => {
         px: 3,
         py: 1
       }}
+      
     >
-      ส่งออก PDF
+      PDF
     </Button>
   )
 }
