@@ -32,6 +32,7 @@ import {
   Close as CloseIcon,
   Logout,
   AccountCircle,
+  AdminPanelSettings,
 } from '@mui/icons-material'
 import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
@@ -44,6 +45,7 @@ const menuItems = [
   { text: 'ห้องพัก', icon: <Hotel />, href: '/rooms' },
   { text: 'ลูกค้า', icon: <Person />, href: '/customers' },
   { text: 'การจอง', icon: <CalendarToday />, href: '/reservations' },
+  { text: 'ผู้ใช้', icon: <AdminPanelSettings />, href: '/users' },
 ]
 
 interface AppLayoutProps {
