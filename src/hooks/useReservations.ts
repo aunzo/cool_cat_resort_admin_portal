@@ -74,7 +74,7 @@ export const useReservations = () => {
     try {
       setLoading(true)
       setError(null)
-      const userReservations = await reservationService.getUserReservations(userId)
+      const userReservations = await reservationService.getCustomerReservations(userId)
       return userReservations
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ไม่สามารถดึงข้อมูลการจองของลูกค้าได้')

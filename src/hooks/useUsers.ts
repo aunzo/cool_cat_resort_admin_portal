@@ -31,10 +31,10 @@ export const useUsers = () => {
     }
   }
 
-  const updateUser = async (userData: UpdateUserData) => {
+  const updateUser = async (id: string, userData: UpdateUserData) => {
     try {
       setError(null)
-      await userService.updateUser(userData.id, userData)
+      await userService.updateUser(id, userData)
       await fetchUsers() // Refresh the list
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update user')

@@ -15,10 +15,10 @@ export const customerService = {
     }
   },
 
-  // Get user by ID
-  async getUserById(id: string): Promise<User | null> {
+  // Get customer by ID
+  async getCustomerById(id: string): Promise<Customer | null> {
     try {
-      const response = await fetch(`/api/users/${id}`)
+      const response = await fetch(`/api/customers/${id}`)
       if (response.status === 404) {
         return null
       }
@@ -27,7 +27,7 @@ export const customerService = {
       }
       return await response.json()
     } catch (error) {
-      console.error('Error fetching user:', error)
+      console.error('Error fetching customer:', error)
       throw new Error('ไม่สามารถดึงข้อมูลลูกค้าได้')
     }
   },
