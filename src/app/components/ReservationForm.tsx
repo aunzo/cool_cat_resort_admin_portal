@@ -26,10 +26,10 @@ import {
   Checkbox,
 } from '@mui/material'
 import { useReservations } from '@/hooks/useReservations'
-import { useUsers } from '@/hooks/useUsers'
+import { useCustomers } from '@/hooks/useCustomers'
 import { useRooms } from '@/hooks/useRooms'
 import { ReservationFormSchema, CreateReservationData, ReservationWithDetails } from '@/types/reservation'
-import { CreateUserData, User } from '@/types/user'
+import { CreateCustomerData, Customer } from '@/types/customer'
 import { Room } from '@/types/room'
 import { Add as AddIcon } from '@mui/icons-material'
 import { z } from 'zod'
@@ -45,7 +45,7 @@ interface ReservationFormProps {
 
 export default function ReservationForm({ reservationHook, editingReservation, onEditComplete }: ReservationFormProps) {
   const [formData, setFormData] = useState<ReservationFormData>({
-    userId: editingReservation?.userId || '',
+    customerId: editingReservation?.customerId || '',
     roomIds: editingReservation?.rooms?.map(rr => rr.roomId) || [],
     checkInDate: editingReservation?.checkInDate ? new Date(editingReservation.checkInDate) : new Date(),
     checkOutDate: editingReservation?.checkOutDate ? new Date(editingReservation.checkOutDate) : new Date(),
@@ -57,17 +57,17 @@ export default function ReservationForm({ reservationHook, editingReservation, o
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [userSearchValue, setUserSearchValue] = useState('')
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  const [customerSearchValue, setCustomerSearchValue] = useState('')
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([])
-  const [openUserDialog, setOpenUserDialog] = useState(false)
-  const [newUserData, setNewUserData] = useState<CreateUserData>({
+  const [openCustomerDialog, setOpenCustomerDialog] = useState(false)
+  const [newCustomerData, setNewCustomerData] = useState<CreateCustomerData>({
     name: '',
     address: '',
     taxId: ''
   })
-  const [newUserErrors, setNewUserErrors] = useState<Partial<Record<keyof CreateUserData, string>>>({})
-  const [isCreatingUser, setIsCreatingUser] = useState(false)
+  const [newCustomerErrors, setNewCustomerErrors] = useState<Partial<Record<keyof CreateCustomerData, string>>>({})
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   
@@ -75,17 +75,17 @@ export default function ReservationForm({ reservationHook, editingReservation, o
   const { createReservation, updateReservation } = reservationHook || fallbackHook
   const isEditing = !!editingReservation
   
-  const { users, createUser } = useUsers()
+  const { customers, createCustomer } = useCustomers()
   const { rooms } = useRooms()
 
   // Initialize form data when editing
   useEffect(() => {
-    if (editingReservation && users.length > 0 && rooms.length > 0) {
-      // Set selected user
-      const user = users.find(u => u.id === editingReservation.userId)
-      if (user) {
-        setSelectedUser(user)
-        setUserSearchValue(`${user.name} - ${user.taxId}`)
+    if (editingReservation && customers.length > 0 && rooms.length > 0) {
+      // Set selected customer
+      const customer = customers.find(c => c.id === editingReservation.customerId)
+      if (customer) {
+        setSelectedCustomer(customer)
+        setCustomerSearchValue(`${customer.name} - ${customer.taxId}`)
       }
       
       // Set selected rooms
@@ -95,7 +95,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
       )
       setSelectedRooms(selectedRoomObjects)
     }
-  }, [editingReservation, users, rooms])
+  }, [editingReservation, customers, rooms])
 
   // Calculate number of days between check-in and check-out
   const calculateDays = useCallback(() => {
@@ -158,61 +158,61 @@ export default function ReservationForm({ reservationHook, editingReservation, o
     }
   }
 
-  const handleUserChange = (event: any, newValue: User | null) => {
-    setSelectedUser(newValue)
-    setFormData(prev => ({ ...prev, userId: newValue?.id || '' }))
+  const handleCustomerChange = (event: any, newValue: Customer | null) => {
+    setSelectedCustomer(newValue)
+    setFormData(prev => ({ ...prev, customerId: newValue?.id || '' }))
     
-    // Clear error for userId field
-    if (errors.userId) {
-      setErrors(prev => ({ ...prev, userId: '' }))
+    // Clear error for customerId field
+    if (errors.customerId) {
+      setErrors(prev => ({ ...prev, customerId: '' }))
     }
   }
 
-  const handleNewUserChange = (field: keyof CreateUserData) => (
+  const handleNewCustomerChange = (field: keyof CreateCustomerData) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value
-    setNewUserData(prev => ({ ...prev, [field]: value }))
+    setNewCustomerData(prev => ({ ...prev, [field]: value }))
     
     // Clear error for this field
-    if (newUserErrors[field]) {
-      setNewUserErrors(prev => ({ ...prev, [field]: '' }))
+    if (newCustomerErrors[field]) {
+      setNewCustomerErrors(prev => ({ ...prev, [field]: '' }))
     }
   }
 
-  const validateNewUser = (): boolean => {
-    const errors: Partial<Record<keyof CreateUserData, string>> = {}
+  const validateNewCustomer = (): boolean => {
+    const errors: Partial<Record<keyof CreateCustomerData, string>> = {}
     
-    if (!newUserData.name.trim()) {
+    if (!newCustomerData.name.trim()) {
       errors.name = 'Name is required'
     }
-    if (!newUserData.address.trim()) {
+    if (!newCustomerData.address.trim()) {
       errors.address = 'Address is required'
     }
-    if (!newUserData.taxId.trim()) {
+    if (!newCustomerData.taxId.trim()) {
       errors.taxId = 'Tax ID is required'
     }
     
-    setNewUserErrors(errors)
+    setNewCustomerErrors(errors)
     return Object.keys(errors).length === 0
   }
 
-  const handleCreateUser = async () => {
-    if (!validateNewUser()) {
+  const handleCreateCustomer = async () => {
+    if (!validateNewCustomer()) {
       return
     }
 
-    setIsCreatingUser(true)
+    setIsCreatingCustomer(true)
     try {
-      await createUser(newUserData)
+      await createCustomer(newCustomerData)
       // Reset form and close dialog
-      setNewUserData({ name: '', address: '', taxId: '' })
-      setOpenUserDialog(false)
-      // The users list will be automatically updated by the hook
+      setNewCustomerData({ name: '', address: '', taxId: '' })
+      setOpenCustomerDialog(false)
+      // The customers list will be automatically updated by the hook
     } catch (error) {
-      console.error('Error creating user:', error)
+      console.error('Error creating customer:', error)
     } finally {
-      setIsCreatingUser(false)
+      setIsCreatingCustomer(false)
     }
   }
 
@@ -249,7 +249,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
 
     try {
       const reservationData: CreateReservationData = {
-        userId: formData.userId,
+        customerId: formData.customerId,
         roomIds: formData.roomIds,
         checkInDate: formData.checkInDate,
         checkOutDate: formData.checkOutDate,
@@ -270,7 +270,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
         
         // Reset form only when creating
         setFormData({
-        userId: '',
+        customerId: '',
         roomIds: [],
         checkInDate: new Date(),
         checkOutDate: new Date(),
@@ -278,8 +278,8 @@ export default function ReservationForm({ reservationHook, editingReservation, o
         extraBed: false,
         notes: '',
       })
-        setSelectedUser(null)
-        setUserSearchValue('')
+        setSelectedCustomer(null)
+        setCustomerSearchValue('')
         setSelectedRooms([])
       }
     } catch (error) {
@@ -323,20 +323,20 @@ export default function ReservationForm({ reservationHook, editingReservation, o
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                 <Autocomplete
                   fullWidth
-                  options={users}
+                  options={customers}
                   getOptionLabel={(option) => `${option.name} - ${option.taxId}`}
-                  value={selectedUser}
-                  onChange={handleUserChange}
-                  inputValue={userSearchValue}
+                  value={selectedCustomer}
+                  onChange={handleCustomerChange}
+                  inputValue={customerSearchValue}
                   onInputChange={(event, newInputValue) => {
-                    setUserSearchValue(newInputValue)
+                    setCustomerSearchValue(newInputValue)
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="ค้นหาลูกค้า"
-                      error={!!errors.userId}
-                      helperText={errors.userId}
+                      error={!!errors.customerId}
+                      helperText={errors.customerId}
                       placeholder="พิมพ์เพื่อค้นหาลูกค้า..."
                     />
                   )}
@@ -353,7 +353,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                   noOptionsText="ไม่พบลูกค้า"
                 />
                 <IconButton
-                  onClick={() => setOpenUserDialog(true)}
+                  onClick={() => setOpenCustomerDialog(true)}
                   sx={{ 
                     mt: 1,
                     bgcolor: 'primary.main',
@@ -514,20 +514,20 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                    <Autocomplete
                      fullWidth
-                     options={users}
+                     options={customers}
                      getOptionLabel={(option) => `${option.name} - ${option.taxId}`}
-                     value={selectedUser}
-                     onChange={handleUserChange}
-                     inputValue={userSearchValue}
+                     value={selectedCustomer}
+                     onChange={handleCustomerChange}
+                     inputValue={customerSearchValue}
                      onInputChange={(event, newInputValue) => {
-                       setUserSearchValue(newInputValue)
+                       setCustomerSearchValue(newInputValue)
                      }}
                      renderInput={(params) => (
                        <TextField
                          {...params}
                          label="ค้นหาลูกค้า"
-                         error={!!errors.userId}
-                         helperText={errors.userId}
+                         error={!!errors.customerId}
+                         helperText={errors.customerId}
                          placeholder="พิมพ์เพื่อค้นหาลูกค้า..."
                        />
                      )}
@@ -544,7 +544,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                      noOptionsText="ไม่พบลูกค้า"
                    />
                    <IconButton
-                     onClick={() => setOpenUserDialog(true)}
+                     onClick={() => setOpenCustomerDialog(true)}
                      sx={{ 
                        mt: 1,
                        bgcolor: 'primary.main',
@@ -685,10 +685,10 @@ export default function ReservationForm({ reservationHook, editingReservation, o
         </Box>
       )}
 
-      {/* New User Dialog */}
+      {/* New Customer Dialog */}
       <Dialog 
-        open={openUserDialog} 
-        onClose={() => setOpenUserDialog(false)}
+        open={openCustomerDialog} 
+        onClose={() => setOpenCustomerDialog(false)}
         maxWidth="sm"
         fullWidth
       >
@@ -700,10 +700,10 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 <TextField
                   fullWidth
                   label="ชื่อ"
-                  value={newUserData.name}
-                  onChange={handleNewUserChange('name')}
-                  error={!!newUserErrors.name}
-                  helperText={newUserErrors.name}
+                  value={newCustomerData.name}
+                  onChange={handleNewCustomerChange('name')}
+                  error={!!newCustomerErrors.name}
+                  helperText={newCustomerErrors.name}
                   required
                 />
               </Grid>
@@ -711,10 +711,10 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 <TextField
                   fullWidth
                   label="ที่อยู่"
-                  value={newUserData.address}
-                  onChange={handleNewUserChange('address')}
-                  error={!!newUserErrors.address}
-                  helperText={newUserErrors.address}
+                  value={newCustomerData.address}
+                  onChange={handleNewCustomerChange('address')}
+                  error={!!newCustomerErrors.address}
+                  helperText={newCustomerErrors.address}
                   required
                   multiline
                   rows={2}
@@ -724,10 +724,10 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 <TextField
                   fullWidth
                   label="เลขประจำตัวผู้เสียภาษี"
-                  value={newUserData.taxId}
-                  onChange={handleNewUserChange('taxId')}
-                  error={!!newUserErrors.taxId}
-                  helperText={newUserErrors.taxId}
+                  value={newCustomerData.taxId}
+                  onChange={handleNewCustomerChange('taxId')}
+                  error={!!newCustomerErrors.taxId}
+                  helperText={newCustomerErrors.taxId}
                   required
                 />
               </Grid>
@@ -736,18 +736,18 @@ export default function ReservationForm({ reservationHook, editingReservation, o
         </DialogContent>
         <DialogActions>
           <Button 
-            onClick={() => setOpenUserDialog(false)}
-            disabled={isCreatingUser}
+            onClick={() => setOpenCustomerDialog(false)}
+            disabled={isCreatingCustomer}
           >
 ยกเลิก
           </Button>
           <Button 
-            onClick={handleCreateUser}
+            onClick={handleCreateCustomer}
             variant="contained"
-            disabled={isCreatingUser}
-            startIcon={isCreatingUser ? <CircularProgress size={20} /> : null}
+            disabled={isCreatingCustomer}
+            startIcon={isCreatingCustomer ? <CircularProgress size={20} /> : null}
           >
-            {isCreatingUser ? 'กำลังสร้าง...' : 'สร้างลูกค้า'}
+            {isCreatingCustomer ? 'กำลังสร้าง...' : 'สร้างลูกค้า'}
           </Button>
         </DialogActions>
       </Dialog>

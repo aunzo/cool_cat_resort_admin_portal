@@ -10,7 +10,7 @@ export async function GET(
     const reservation = await prisma.reservation.findUnique({
       where: { id: params.id },
       include: {
-        user: true,
+        customer: true,
         rooms: {
           include: {
             room: true
@@ -45,7 +45,7 @@ export async function PUT(
     
     // Handle room updates if roomIds are provided
     const updateData: any = {
-      userId: data.userId,
+      customerId: data.customerId,
       checkInDate: data.checkInDate,
       checkOutDate: data.checkOutDate,
       totalAmount: data.totalAmount,
@@ -70,7 +70,7 @@ export async function PUT(
       where: { id: params.id },
       data: updateData,
       include: {
-        user: true,
+        customer: true,
         rooms: {
           include: {
             room: true
@@ -92,7 +92,7 @@ export async function PUT(
     
     if (error.code === 'P2003') {
       return NextResponse.json(
-        { error: 'Invalid user or room ID' },
+        { error: 'Invalid customer or room ID' },
         { status: 400 }
       )
     }

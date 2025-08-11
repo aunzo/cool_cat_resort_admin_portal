@@ -31,8 +31,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  useTheme,
-  useMediaQuery,
   Tooltip,
 } from '@mui/material'
 import {
@@ -55,8 +53,6 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
   const [roomToDelete, setRoomToDelete] = useState<Room | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const fallbackHook = useRooms()
   const { rooms, loading, error } = roomHook || fallbackHook
 

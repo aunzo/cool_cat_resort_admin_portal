@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -16,47 +10,53 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
   name      String
-  address   String
-  taxId     String
+  role      String   @default("admin")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  // Relations
-  reservations Reservation[]
-  
+
   @@map("users")
 }
 
+model Customer {
+  id           String        @id @default(cuid())
+  name         String
+  address      String
+  taxId        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reservations Reservation[]
+
+  @@map("customers")
+}
+
 model Room {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relations
+  id               String            @id @default(cuid())
+  name             String            @unique
+  price            Float
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   reservationRooms ReservationRoom[]
-  
+
   @@map("rooms")
 }
 
 model Reservation {
-  id           String   @id @default(cuid())
+  id           String            @id @default(cuid())
   number       Int
-  userId       String
+  customerId   String
   checkInDate  DateTime
   checkOutDate DateTime
   totalAmount  Float
-  extraBed     Boolean  @default(false)
+  extraBed     Boolean           @default(false)
   notes        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  // Relations
-  user  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  rooms ReservationRoom[]
-  
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  rooms        ReservationRoom[]
+  customer     Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
   @@map("reservations")
 }
 
@@ -65,11 +65,9 @@ model ReservationRoom {
   reservationId String
   roomId        String
   createdAt     DateTime    @default(now())
-  
-  // Relations
   reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   room          Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  
+
   @@unique([reservationId, roomId])
   @@map("reservation_rooms")
 }

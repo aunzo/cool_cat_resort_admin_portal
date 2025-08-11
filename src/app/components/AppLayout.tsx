@@ -18,6 +18,10 @@ import {
   useTheme,
   useMediaQuery,
   Divider,
+  Menu,
+  MenuItem,
+  Avatar,
+  CircularProgress,
 } from '@mui/material'
 import {
   Hotel,
@@ -26,14 +30,19 @@ import {
   CalendarToday,
   Menu as MenuIcon,
   Close as CloseIcon,
+  Logout,
+  AccountCircle,
 } from '@mui/icons-material'
 import Image from 'next/image'
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import logoImage from '@/assets/images/logos/logo-cchouse-2021.png'
 
 const menuItems = [
   { text: 'หน้าหลัก', icon: <Home />, href: '/' },
   { text: 'ห้องพัก', icon: <Hotel />, href: '/rooms' },
-  { text: 'ลูกค้า', icon: <Person />, href: '/users' },
+  { text: 'ลูกค้า', icon: <Person />, href: '/customers' },
   { text: 'การจอง', icon: <CalendarToday />, href: '/reservations' },
 ]
 
@@ -44,11 +53,60 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children, title = 'Cool Cat Resort - ระบบจัดการ' }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/login')
+    }
+  }, [status, router])
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          flexDirection: 'column',
+          gap: 2
+        }}
+      >
+        <CircularProgress size={60} />
+        <Typography variant="h6" color="text.secondary">
+          Loading...
+        </Typography>
+      </Box>
+    )
+  }
+
+  // Don't render anything if not authenticated
+  if (!session) {
+    return null
+  }
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
+  }
+
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleUserMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = async () => {
+    handleUserMenuClose()
+    await signOut({ callbackUrl: '/auth/login' })
   }
 
   const mobileDrawerContent = (
@@ -119,6 +177,52 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
             </Link>
           </ListItem>
         ))}
+        
+        {/* Mobile User Info and Logout */}
+        {session && (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <ListItem>
+              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main', mr: 2 }}>
+                  {session.user.name?.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {session.user.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {session.user.username}
+                  </Typography>
+                </Box>
+              </Box>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={handleLogout}
+                sx={{
+                  py: 1.5,
+                  mx: 1,
+                  borderRadius: 2,
+                  color: 'error.main',
+                  '&:hover': {
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ color: 'error.main', minWidth: 40 }}>
+                  <Logout />
+                </ListItemIcon>
+                <ListItemText
+                  primary="ออกจากระบบ"
+                  primaryTypographyProps={{
+                    fontWeight: 500,
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </>
+        )}
       </List>
     </Box>
   )
@@ -191,7 +295,7 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
 
           {/* Desktop Navigation Menu */}
           {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+            <Box sx={{ display: 'flex', gap: 1, ml: 'auto', alignItems: 'center' }}>
               {menuItems.map((item) => (
                 <Link key={item.text} href={item.href} style={{ textDecoration: 'none' }}>
                   <Button
@@ -219,6 +323,49 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
                   </Button>
                 </Link>
               ))}
+              
+              {/* User Menu */}
+              {session && (
+                <Box sx={{ ml: 2 }}>
+                  <IconButton
+                    onClick={handleUserMenuOpen}
+                    sx={{
+                      color: 'white',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                      },
+                    }}
+                  >
+                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
+                      {session.user.name?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleUserMenuClose}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                  >
+                    <MenuItem disabled>
+                      <Box>
+                        <Typography variant="subtitle2">{session.user.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {session.user.username}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleLogout}>
+                      <ListItemIcon>
+                        <Logout fontSize="small" />
+                      </ListItemIcon>
+                      ออกจากระบบ
+                    </MenuItem>
+                  </Menu>
+                </Box>
+              )}
             </Box>
           )}
         </Toolbar>

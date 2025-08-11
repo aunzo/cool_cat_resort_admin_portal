@@ -3,6 +3,7 @@ import { Sarabun } from 'next/font/google'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter'
+import SessionProviderWrapper from '../components/SessionProviderWrapper'
 import theme from './theme'
 
 const sarabun = Sarabun({ 
@@ -26,7 +27,9 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            {children}
+            <SessionProviderWrapper>
+          {children}
+        </SessionProviderWrapper>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

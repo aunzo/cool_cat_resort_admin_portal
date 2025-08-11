@@ -146,16 +146,16 @@ const PDFExport: React.FC<PDFExportProps> = ({ reservation, onExport }) => {
           <div style="display: flex; margin-bottom: 10px;">
             <div style="flex: 1; margin-right: 20px;">
               <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">นามลูกค้า / Name</div>
-              <div style="font-size: 14px; text-align: left;">${reservation.user?.name || 'N/A'}</div>
+              <div style="font-size: 14px; text-align: left;">${reservation.customer?.name || 'N/A'}</div>
             </div>
             <div style="flex: 1;">
               <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">เลขผู้เสียภาษี / Tax. ID.</div>
-              <div style="font-size: 14px; text-align: left;">${reservation.user?.taxId || 'N/A'}</div>
+              <div style="font-size: 14px; text-align: left;">${reservation.customer?.taxId || 'N/A'}</div>
             </div>
           </div>
           <div style="margin-bottom: 20px;">
             <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">ที่อยู่ลูกค้า / Address</div>
-            <div style="font-size: 14px; text-align: left;">${reservation.user?.address || 'N/A'}</div>
+            <div style="font-size: 14px; text-align: left;">${reservation.customer?.address || 'N/A'}</div>
           </div>
         </div>
         

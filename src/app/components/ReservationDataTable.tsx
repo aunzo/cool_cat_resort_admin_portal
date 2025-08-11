@@ -100,20 +100,20 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
   const columns = useMemo<ColumnDef<ReservationWithDetails>[]>(
     () => [
       {
-         accessorKey: 'number',
-         header: '#',
-         cell: (info) => {
-           const number = info.getValue() as number
-           return number ? `#${number}` : 'N/A'
-         },
-       },
+        accessorKey: 'number',
+        header: '#',
+        cell: (info) => {
+          const number = info.getValue() as number
+          return number ? `#${number}` : 'N/A'
+        },
+      },
       {
-        accessorKey: 'user.name',
+        accessorKey: 'customer.name',
         header: 'ชื่อแขก',
         cell: (info) => info.getValue() || 'ลูกค้าที่ถูกลบ',
       },
       {
-        accessorKey: 'user.taxId',
+        accessorKey: 'customer.taxId',
         header: 'เลขประจำตัวผู้เสียภาษี',
         cell: (info) => info.getValue() || 'N/A',
       },
@@ -122,8 +122,8 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
         header: 'ห้องพัก',
         cell: (info) => {
           const rooms = info.getValue() as any[]
-          return rooms && rooms.length > 0 
-            ? rooms.map(reservationRoom => reservationRoom.room?.name || 'ไม่ทราบชื่อห้อง').join(', ') 
+          return rooms && rooms.length > 0
+            ? rooms.map(reservationRoom => reservationRoom.room?.name || 'ไม่ทราบชื่อห้อง').join(', ')
             : 'ไม่มีห้องพัก'
         },
       },
@@ -184,7 +184,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   <Delete fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <PDFExport 
+              <PDFExport
                 reservation={reservation}
                 onExport={() => console.log('PDF exported for reservation:', reservation.id)}
               />
@@ -248,155 +248,165 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
         sx={{ mb: 2 }}
         size="small"
       />
-      {table.getRowModel().rows.map((row) => {
-        const reservation = row.original
-        return (
-          <Card key={reservation.id} sx={{ mb: 2, borderRadius: 2 }}>
-            <CardContent sx={{ pb: 2 }}>
-              <Stack spacing={2}>
-                <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                  {reservation.user?.name || 'ลูกค้าที่ถูกลบ'}
-                </Typography>
-                <Stack spacing={1}>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    <strong>หมายเลขการจอง:</strong> {reservation.number ? `#${reservation.number}` : 'N/A'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    <strong>เลขประจำตัวผู้เสียภาษี:</strong> {reservation.user?.taxId || 'N/A'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    <strong>ห้องพัก:</strong> {reservation.rooms && reservation.rooms.length > 0 
-                      ? reservation.rooms.map(reservationRoom => reservationRoom.room?.name || 'ไม่ทราบชื่อห้อง').join(', ') 
-                      : 'ไม่มีห้องพัก'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    <strong>เช็คอิน:</strong> {reservation.checkInDate ? new Date(reservation.checkInDate).toLocaleDateString() : 'N/A'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    <strong>เช็คเอาท์:</strong> {reservation.checkOutDate ? new Date(reservation.checkOutDate).toLocaleDateString() : 'N/A'}
-                  </Typography>
-                  <Typography variant="body1" fontWeight="bold" color="primary">
-                    ${reservation.totalAmount?.toFixed(2) || '0.00'}
-                  </Typography>
-                </Stack>
-                <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: '1fr 1fr', 
-                  gap: 2, 
-                  mt: 2
-                }}>
-                  <Tooltip title="ดูรายละเอียด">
-                    <IconButton
-                      size="medium"
-                      color="primary"
-                      onClick={() => handleViewReservation(reservation)}
-                      sx={{ 
-                        minHeight: 44,
-                        borderRadius: 2,
-                        border: '1px solid',
-                        borderColor: 'primary.main'
-                      }}
-                    >
-                      <Visibility fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="แก้ไข">
-                    <IconButton
-                      size="medium"
-                      color="secondary"
-                      onClick={() => handleEditReservation(reservation)}
-                      sx={{ 
-                        minHeight: 44,
-                        borderRadius: 2,
-                        border: '1px solid',
-                        borderColor: 'secondary.main'
-                      }}
-                    >
-                      <Edit fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="ลบ">
-                    <IconButton
-                      size="medium"
-                      color="error"
-                      onClick={() => handleDeleteClick(reservation)}
-                      sx={{ 
-                        minHeight: 44,
-                        borderRadius: 2,
-                        border: '1px solid',
-                        borderColor: 'error.main'
-                      }}
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <PDFExport 
-                      reservation={reservation}
-                      onExport={() => console.log('PDF exported for reservation:', reservation.id)}
-                    />
-                  </Box>
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-        )
-      })}
-      
-      {table.getPageCount() > 1 && (
-        <Box sx={{ mt: 3 }}>
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
-            textAlign="center"
-            sx={{ mb: 2 }}
-          >
-            หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+      {table.getRowModel().rows.length === 0 ? (
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {reservationsWithDetails.length === 0 ? 'ไม่พบการจอง เพิ่มการจองแรกด้านบน' : 'ไม่พบการจองที่ตรงกับการค้นหา'}
           </Typography>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: 2,
-            flexWrap: 'wrap'
-          }}>
-            <Button
-              variant="outlined"
-              size="medium"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-              sx={{ minWidth: 48, minHeight: 48 }}
-            >
-              {'<<'}
-            </Button>
-            <Button
-              variant="outlined"
-              size="medium"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              sx={{ minWidth: 48, minHeight: 48 }}
-            >
-              {'<'}
-            </Button>
-            <Button
-              variant="outlined"
-              size="medium"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              sx={{ minWidth: 48, minHeight: 48 }}
-            >
-              {'>'}
-            </Button>
-            <Button
-              variant="outlined"
-              size="medium"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-              sx={{ minWidth: 48, minHeight: 48 }}
-            >
-              {'>>'}
-            </Button>
-          </Box>
         </Box>
+      ) : (
+        <>
+          {table.getRowModel().rows.map((row) => {
+            const reservation = row.original
+            return (
+              <Card key={reservation.id} sx={{ mb: 2, borderRadius: 2 }}>
+                <CardContent sx={{ pb: 2 }}>
+                  <Stack spacing={2}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                      {reservation.customer?.name || 'ลูกค้าที่ถูกลบ'}
+                    </Typography>
+                    <Stack spacing={1}>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>หมายเลขการจอง:</strong> {reservation.number ? `#${reservation.number}` : 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>เลขประจำตัวผู้เสียภาษี:</strong> {reservation.customer?.taxId || 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>ห้องพัก:</strong> {reservation.rooms && reservation.rooms.length > 0
+                          ? reservation.rooms.map(reservationRoom => reservationRoom.room?.name || 'ไม่ทราบชื่อห้อง').join(', ')
+                          : 'ไม่มีห้องพัก'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>เช็คอิน:</strong> {reservation.checkInDate ? new Date(reservation.checkInDate).toLocaleDateString() : 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                        <strong>เช็คเอาท์:</strong> {reservation.checkOutDate ? new Date(reservation.checkOutDate).toLocaleDateString() : 'N/A'}
+                      </Typography>
+                      <Typography variant="body1" fontWeight="bold" color="primary">
+                        ${reservation.totalAmount?.toFixed(2) || '0.00'}
+                      </Typography>
+                    </Stack>
+                    <Box sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 2,
+                      mt: 2
+                    }}>
+                      <Tooltip title="ดูรายละเอียด">
+                        <IconButton
+                          size="medium"
+                          color="primary"
+                          onClick={() => handleViewReservation(reservation)}
+                          sx={{
+                            minHeight: 44,
+                            borderRadius: 2,
+                            border: '1px solid',
+                            borderColor: 'primary.main'
+                          }}
+                        >
+                          <Visibility fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="แก้ไข">
+                        <IconButton
+                          size="medium"
+                          color="secondary"
+                          onClick={() => handleEditReservation(reservation)}
+                          sx={{
+                            minHeight: 44,
+                            borderRadius: 2,
+                            border: '1px solid',
+                            borderColor: 'secondary.main'
+                          }}
+                        >
+                          <Edit fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="ลบ">
+                        <IconButton
+                          size="medium"
+                          color="error"
+                          onClick={() => handleDeleteClick(reservation)}
+                          sx={{
+                            minHeight: 44,
+                            borderRadius: 2,
+                            border: '1px solid',
+                            borderColor: 'error.main'
+                          }}
+                        >
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <PDFExport
+                          reservation={reservation}
+                          onExport={() => console.log('PDF exported for reservation:', reservation.id)}
+                        />
+                      </Box>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )
+          })}
+
+          {table.getPageCount() > 1 && (
+            <Box sx={{ mt: 3 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign="center"
+                sx={{ mb: 2 }}
+              >
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+              </Typography>
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 2,
+                flexWrap: 'wrap'
+              }}>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'<<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'>'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'>>'}
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </>
       )}
     </Box>
   )
@@ -416,101 +426,112 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
           {table.getFilteredRowModel().rows.length} การจอง
         </Typography>
       </Box>
-      
-      <TableContainer component={Paper} elevation={1}>
-        <Table>
-          <TableHead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell
-                    key={header.id}
-                    onClick={header.column.getToggleSortingHandler()}
-                    sx={{
-                      cursor: header.column.getCanSort() ? 'pointer' : 'default',
-                      userSelect: 'none',
-                      fontWeight: 600,
-                      backgroundColor: 'grey.50',
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    {{
-                      asc: ' 🔼',
-                      desc: ' 🔽',
-                    }[header.column.getIsSorted() as string] ?? null}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} hover>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      
-      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            {'<<'}
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            {'<'}
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            {'>'}
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            {'>>'}
-          </Button>
+
+      {table.getRowModel().rows.length === 0 ? (
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {reservationsWithDetails.length === 0 ? 'ไม่พบการจอง เพิ่มการจองแรกด้านบน' : 'ไม่พบการจองที่ตรงกับการค้นหา'}
+          </Typography>
         </Box>
-        <Typography variant="body2" color="text.secondary">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-        </Typography>
-      </Box>
+      ) : (
+        <>
+          <TableContainer component={Paper} elevation={1}>
+            <Table>
+              <TableHead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableCell
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        sx={{
+                          cursor: header.column.getCanSort() ? 'pointer' : 'default',
+                          userSelect: 'none',
+                          fontWeight: 600,
+                          backgroundColor: 'grey.50',
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        {{
+                          asc: ' 🔼',
+                          desc: ' 🔽',
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} hover>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+              >
+                {'<<'}
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                {'<'}
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                {'>'}
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+              >
+                {'>>'}
+              </Button>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </Typography>
+          </Box>
+        </>
+      )}
     </Box>
   )
 
+
   return (
     <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
-      <Typography 
-        variant={isMobile ? "h6" : "h5"} 
-        component="h2" 
+      <Typography
+        variant={isMobile ? "h6" : "h5"}
+        component="h2"
         gutterBottom
-        sx={{ 
+        sx={{
           fontWeight: 600,
           color: 'primary.main',
           mb: { xs: 2, sm: 3 }
@@ -518,10 +539,10 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
       >
         Reservations ({reservationsWithDetails.length})
       </Typography>
-      
+
       <MobileView />
       <DesktopView />
-      
+
       {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
@@ -535,7 +556,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
         <DialogContent>
           <DialogContentText id="delete-dialog-description">
             คุณแน่ใจหรือไม่ที่จะลบการจอง {selectedReservation?.number ? `#${selectedReservation.number}` : ''}
-            ของ {selectedReservation?.user?.name || 'ลูกค้าที่ถูกลบ'}? การดำเนินการนี้ไม่สามารถยกเลิกได้
+            ของ {selectedReservation?.customer?.name || 'ลูกค้าที่ถูกลบ'}? การดำเนินการนี้ไม่สามารถยกเลิกได้
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -549,8 +570,8 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
       </Dialog>
 
       {/* Edit Reservation Dialog */}
-      <Dialog 
-        open={editDialogOpen} 
+      <Dialog
+        open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
         maxWidth="md"
         fullWidth
@@ -561,7 +582,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
         </DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 2 }}>
-            <ReservationForm 
+            <ReservationForm
               reservationHook={reservationHook}
               editingReservation={selectedReservation || undefined}
               onEditComplete={handleEditComplete}
@@ -573,78 +594,78 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
             ยกเลิก
           </Button>
         </DialogActions>
-       </Dialog>
+      </Dialog>
 
-       {/* View Reservation Dialog */}
-       <Dialog 
-         open={viewDialogOpen} 
-         onClose={() => setViewDialogOpen(false)}
-         maxWidth="sm"
-         fullWidth
-       >
-         <DialogTitle>
-           รายละเอียดการจอง {selectedReservation?.number ? `#${selectedReservation.number}` : ''}
-         </DialogTitle>
-         <DialogContent>
-           <Box sx={{ pt: 2 }}>
-             {selectedReservation && (
-               <Stack spacing={2}>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">ชื่อลูกค้า</Typography>
-                   <Typography variant="body1">{selectedReservation.user?.name || 'ลูกค้าที่ถูกลบ'}</Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">เลขประจำตัวผู้เสียภาษี</Typography>
-                   <Typography variant="body1">{selectedReservation.user?.taxId || 'N/A'}</Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">ที่อยู่</Typography>
-                   <Typography variant="body1">{selectedReservation.user?.address || 'N/A'}</Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">ห้องพัก</Typography>
-                   <Typography variant="body1">
-                     {selectedReservation.rooms && selectedReservation.rooms.length > 0 
-                       ? selectedReservation.rooms.map(rr => rr.room?.name || 'ไม่ทราบชื่อห้อง').join(', ') 
-                       : 'ไม่มีห้องพัก'}
-                   </Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">วันที่เช็คอิน</Typography>
-                   <Typography variant="body1">
-                     {selectedReservation.checkInDate ? new Date(selectedReservation.checkInDate).toLocaleDateString() : 'N/A'}
-                   </Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">วันที่เช็คเอาท์</Typography>
-                   <Typography variant="body1">
-                     {selectedReservation.checkOutDate ? new Date(selectedReservation.checkOutDate).toLocaleDateString() : 'N/A'}
-                   </Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">จำนวนเงินรวม</Typography>
-                   <Typography variant="body1">฿{selectedReservation.totalAmount?.toLocaleString() || '0'}</Typography>
-                 </Box>
-                 <Box>
-                   <Typography variant="subtitle2" color="text.secondary">เตียงเสริม</Typography>
-                   <Typography variant="body1">{selectedReservation.extraBed ? 'มี (+฿100/วัน)' : 'ไม่มี'}</Typography>
-                 </Box>
-                 {selectedReservation.notes && (
-                   <Box>
-                     <Typography variant="subtitle2" color="text.secondary">หมายเหตุ</Typography>
-                     <Typography variant="body1">{selectedReservation.notes}</Typography>
-                   </Box>
-                 )}
-               </Stack>
-             )}
-           </Box>
-         </DialogContent>
-         <DialogActions>
-           <Button onClick={() => setViewDialogOpen(false)}>
-             ปิด
-           </Button>
-         </DialogActions>
-       </Dialog>
-     </Paper>
-   )
- }
+      {/* View Reservation Dialog */}
+      <Dialog
+        open={viewDialogOpen}
+        onClose={() => setViewDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          รายละเอียดการจอง {selectedReservation?.number ? `#${selectedReservation.number}` : ''}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 2 }}>
+            {selectedReservation && (
+              <Stack spacing={2}>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">ชื่อลูกค้า</Typography>
+                  <Typography variant="body1">{selectedReservation.customer?.name || 'ลูกค้าที่ถูกลบ'}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">เลขประจำตัวผู้เสียภาษี</Typography>
+                  <Typography variant="body1">{selectedReservation.customer?.taxId || 'N/A'}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">ที่อยู่</Typography>
+                  <Typography variant="body1">{selectedReservation.customer?.address || 'N/A'}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">ห้องพัก</Typography>
+                  <Typography variant="body1">
+                    {selectedReservation.rooms && selectedReservation.rooms.length > 0
+                      ? selectedReservation.rooms.map(rr => rr.room?.name || 'ไม่ทราบชื่อห้อง').join(', ')
+                      : 'ไม่มีห้องพัก'}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">วันที่เช็คอิน</Typography>
+                  <Typography variant="body1">
+                    {selectedReservation.checkInDate ? new Date(selectedReservation.checkInDate).toLocaleDateString() : 'N/A'}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">วันที่เช็คเอาท์</Typography>
+                  <Typography variant="body1">
+                    {selectedReservation.checkOutDate ? new Date(selectedReservation.checkOutDate).toLocaleDateString() : 'N/A'}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">จำนวนเงินรวม</Typography>
+                  <Typography variant="body1">฿{selectedReservation.totalAmount?.toLocaleString() || '0'}</Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">เตียงเสริม</Typography>
+                  <Typography variant="body1">{selectedReservation.extraBed ? 'มี (+฿100/วัน)' : 'ไม่มี'}</Typography>
+                </Box>
+                {selectedReservation.notes && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">หมายเหตุ</Typography>
+                    <Typography variant="body1">{selectedReservation.notes}</Typography>
+                  </Box>
+                )}
+              </Stack>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewDialogOpen(false)}>
+            ปิด
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Paper>
+  )
+}

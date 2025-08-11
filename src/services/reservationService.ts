@@ -95,16 +95,16 @@ export const reservationService = {
     }
   },
 
-  // Get reservations by user ID
-  async getUserReservations(userId: string): Promise<ReservationWithDetails[]> {
+  // Get reservations for a specific customer
+  async getCustomerReservations(customerId: string): Promise<ReservationWithDetails[]> {
     try {
-      const response = await fetch(`/api/reservations?userId=${encodeURIComponent(userId)}`)
+      const response = await fetch(`/api/reservations?customerId=${customerId}&withDetails=true`)
       if (!response.ok) {
         throw new Error('ไม่สามารถดึงข้อมูลการจองของลูกค้าได้')
       }
       return await response.json()
     } catch (error) {
-      console.error('Error fetching user reservations:', error)
+      console.error('Error fetching customer reservations:', error)
       throw new Error('ไม่สามารถดึงข้อมูลการจองของลูกค้าได้')
     }
   },

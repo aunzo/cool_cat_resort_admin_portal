@@ -4,7 +4,7 @@ import { z } from 'zod'
 const BaseReservationSchema = z.object({
   id: z.string().optional(),
   number: z.number().optional(),
-  userId: z.string().min(1, 'จำเป็นต้องระบุรหัสลูกค้า'),
+  customerId: z.string().min(1, 'จำเป็นต้องระบุรหัสลูกค้า'),
   roomIds: z.array(z.string()).min(1, 'จำเป็นต้องเลือกห้องพักอย่างน้อยหนึ่งห้อง'),
   checkInDate: z.date(),
   checkOutDate: z.date(),
@@ -49,7 +49,7 @@ export const ReservationFormSchema = BaseReservationSchema.omit({
 
 // Extended type that includes user and room details for display
 export interface ReservationWithDetails extends Reservation {
-  user?: {
+  customer?: {
     id: string
     name: string
     address: string

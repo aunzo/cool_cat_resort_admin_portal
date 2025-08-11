@@ -5,13 +5,13 @@ import { CreateReservationData } from '@/types/reservation'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
+    const customerId = searchParams.get('customerId')
     const roomId = searchParams.get('roomId')
     const withDetails = searchParams.get('withDetails')
     
-    if (userId) {
+    if (customerId) {
       const reservations = await prisma.reservation.findMany({
-        where: { userId },
+        where: { customerId },
         orderBy: { createdAt: 'desc' }
       })
       return NextResponse.json(reservations)
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
           }
         },
         include: {
-          user: true,
+          customer: true,
           rooms: {
             include: {
               room: true
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     if (withDetails === 'true') {
       const reservations = await prisma.reservation.findMany({
         include: {
-          user: true,
+          customer: true,
           rooms: {
             include: {
               room: true
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     
     const reservation = await prisma.reservation.create({
       data: {
-        userId: data.userId,
+        customerId: data.customerId,
         checkInDate: data.checkInDate,
         checkOutDate: data.checkOutDate,
         totalAmount: data.totalAmount,
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         }
       },
       include: {
-        user: true,
+        customer: true,
         rooms: {
           include: {
             room: true
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     if (error.code === 'P2003') {
       return NextResponse.json(
-        { error: 'Invalid user or room ID' },
+        { error: 'Invalid customer or room ID' },
         { status: 400 }
       )
     }

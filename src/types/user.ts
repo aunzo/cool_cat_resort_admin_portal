@@ -1,27 +1,44 @@
 import { z } from 'zod'
 
-// Zod schema for user validation
-export const UserSchema = z.object({
-  id: z.string().optional(),
+export interface User {
+  id: string
+  username: string
+  password: string
+  name: string
+  role: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CreateUserData {
+  username: string
+  password: string
+  name: string
+  role?: string
+}
+
+export interface UpdateUserData {
+  username?: string
+  name?: string
+  role?: string
+}
+
+export interface LoginData {
+  username: string
+  password: string
+}
+
+export const LoginSchema = z.object({
+  username: z.string().min(1, 'Username is required'),
+  password: z.string().min(1, 'Password is required')
+})
+
+export const CreateUserSchema = z.object({
+  username: z.string().min(1, 'Username is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(1, 'Name is required'),
-  address: z.string().min(1, 'Address is required'),
-  taxId: z.string().min(1, 'Tax ID is required'),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional()
+  role: z.string().optional().default('admin')
 })
 
-// TypeScript type derived from Zod schema
-export type User = z.infer<typeof UserSchema>
-
-// Type for creating a new user (without id, createdAt, updatedAt)
-export type CreateUserData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>
-
-// Type for updating a user
-export type UpdateUserData = Partial<Omit<User, 'id' | 'createdAt'>> & { id: string }
-
-// Schema for form validation (without server-generated fields)
-export const UserFormSchema = UserSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true
-})
+export type LoginFormData = z.infer<typeof LoginSchema>
+export type CreateUserFormData = z.infer<typeof CreateUserSchema>

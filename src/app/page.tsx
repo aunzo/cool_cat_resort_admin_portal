@@ -42,7 +42,7 @@ import Link from 'next/link'
 import AppLayout from '@/app/components/AppLayout'
 import { useReservations } from '@/hooks/useReservations'
 import { useRooms } from '@/hooks/useRooms'
-import { useUsers } from '@/hooks/useUsers'
+import { useCustomers } from '@/hooks/useCustomers'
 import { ReservationWithDetails } from '@/types/reservation'
 import { isSameDay, parseISO, format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts'
@@ -50,7 +50,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 export default function HomePage() {
   const { reservationsWithDetails, loading: reservationsLoading } = useReservations()
   const { rooms, loading: roomsLoading } = useRooms()
-  const { users, loading: usersLoading } = useUsers()
+  const { customers, loading: customersLoading } = useCustomers()
   
   // Modal state for calendar reservations
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null)
@@ -67,7 +67,7 @@ export default function HomePage() {
     .sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
     .slice(0, 5)
   const totalRooms = rooms.length
-  const totalUsers = users.length
+  const totalCustomers = customers.length
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('th-TH', {
@@ -281,7 +281,7 @@ export default function HomePage() {
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Group sx={{ fontSize: 40, mb: 1 }} />
                   <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    {usersLoading ? <CircularProgress size={24} color="inherit" /> : totalUsers}
+                    {customersLoading ? <CircularProgress size={24} color="inherit" /> : totalCustomers}
                   </Typography>
                   <Typography variant="body1">ลูกค้าทั้งหมด</Typography>
                 </CardContent>
@@ -422,7 +422,7 @@ export default function HomePage() {
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                               <Box>
                                 <Typography variant="h6" color="text.secondary">
-                                   ผู้จอง: {(reservation as ReservationWithDetails).user?.name || 'ลูกค้าที่ถูกลบ'}
+                                   ผู้จอง: {(reservation as ReservationWithDetails).customer?.name || 'ลูกค้าที่ถูกลบ'}
                                  </Typography>
                                  <Typography variant="body2" color="text.secondary">
                                    ห้อง: {(reservation as ReservationWithDetails).rooms?.map(room => room.room?.name).join(', ') || 'ไม่มีข้อมูลห้อง'}
@@ -512,7 +512,7 @@ export default function HomePage() {
               </Typography>
               <Button 
                 component={Link} 
-                href="/users" 
+                href="/customers" 
                 variant="contained" 
                 size="large"
                 fullWidth
@@ -577,7 +577,7 @@ export default function HomePage() {
                           การจอง #{reservation.number}
                         </div>
                         <div style={{ fontSize: '0.875rem', color: 'rgba(0, 0, 0, 0.6)' }}>
-                          ผู้จอง: {reservation.user?.name || 'ลูกค้าที่ถูกลบ'}
+                          ผู้จอง: {reservation.customer?.name || 'ลูกค้าที่ถูกลบ'}
                         </div>
                       </React.Fragment>
                     }

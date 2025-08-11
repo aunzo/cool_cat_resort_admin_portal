@@ -1,10 +1,10 @@
 {
   "/not-found": "app/not-found.js",
-  "/page": "app/page.js",
-  "/users/page": "app/users/page.js",
-  "/reservations/page": "app/reservations/page.js",
-  "/rooms/page": "app/rooms/page.js",
   "/api/rooms/route": "app/api/rooms/route.js",
-  "/api/users/route": "app/api/users/route.js",
-  "/api/reservations/route": "app/api/reservations/route.js"
+  "/page": "app/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/customers/page": "app/customers/page.js",
+  "/api/customers/route": "app/api/customers/route.js",
+  "/rooms/page": "app/rooms/page.js"
 }
