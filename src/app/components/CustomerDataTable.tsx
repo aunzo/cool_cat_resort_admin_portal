@@ -342,12 +342,9 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
           placeholder="ค้นหาลูกค้า..."
           value={globalFilter ?? ''}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          sx={{ maxWidth: 400 }}
+          sx={{ width: '100%' }}
           size="small"
         />
-        <Typography variant="body2" color="text.secondary">
-          {table.getFilteredRowModel().rows.length} ลูกค้า
-        </Typography>
       </Box>
       {table.getRowModel().rows.length === 0 ? (
         <Box sx={{ p: 3, textAlign: 'center' }}>
@@ -380,8 +377,8 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                               header.getContext()
                             )}
                         {{
-                          asc: ' 🔼',
-                          desc: ' 🔽',
+                          asc: ' ⬆️',
+                          desc: ' ⬇️',
                         }[header.column.getIsSorted() as string] ?? null}
                       </TableCell>
                     ))}
@@ -401,9 +398,13 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
               </TableBody>
             </Table>
           </TableContainer>
-          {table.getPageCount() > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+          
+          {table.getRowModel().rows.length > 0 && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                แสดง {table.getRowModel().rows.length} จาก {customers.length} รายการ
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <Button
                   variant="outlined"
                   size="small"
@@ -450,19 +451,6 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
   return (
     <>
       <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
-        <Typography 
-          variant={isMobile ? "h6" : "h5"} 
-          component="h2" 
-          gutterBottom
-          sx={{ 
-            fontWeight: 600,
-            color: 'primary.main',
-            mb: { xs: 2, sm: 3 }
-          }}
-        >
-          ลูกค้า ({customers.length})
-        </Typography>
-        
         <MobileView />
         <DesktopView />
       </Paper>

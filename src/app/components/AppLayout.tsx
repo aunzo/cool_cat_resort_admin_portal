@@ -7,7 +7,6 @@ import {
   AppBar,
   Toolbar,
   Button,
-  Container,
   IconButton,
   Drawer,
   List,
@@ -31,7 +30,6 @@ import {
   Menu as MenuIcon,
   Close as CloseIcon,
   Logout,
-  AccountCircle,
   AdminPanelSettings,
 } from '@mui/icons-material'
 import Image from 'next/image'

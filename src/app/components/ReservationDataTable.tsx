@@ -420,11 +420,8 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
           placeholder="ค้นหาการจอง..."
           value={globalFilter ?? ''}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          sx={{ width: '300px' }}
+          sx={{ width: '100%' }}
         />
-        <Typography variant="body2" color="text.secondary">
-          {table.getFilteredRowModel().rows.length} การจอง
-        </Typography>
       </Box>
 
       {table.getRowModel().rows.length === 0 ? (
@@ -458,8 +455,8 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                             header.getContext()
                           )}
                         {{
-                          asc: ' 🔼',
-                          desc: ' 🔽',
+                          asc: ' ⬆️',
+                          desc: ' ⬇️',
                         }[header.column.getIsSorted() as string] ?? null}
                       </TableCell>
                     ))}
@@ -480,45 +477,50 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
             </Table>
           </TableContainer>
 
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                {'<<'}
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                {'<'}
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                {'>'}
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                {'>>'}
-              </Button>
+          {table.getRowModel().rows.length > 0 && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                แสดง {table.getRowModel().rows.length} จาก {reservationsWithDetails.length} รายการ
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>>'}
+                </Button>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+              </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-            </Typography>
-          </Box>
+          )}
         </>
       )}
     </Box>
@@ -527,19 +529,6 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
 
   return (
     <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
-      <Typography
-        variant={isMobile ? "h6" : "h5"}
-        component="h2"
-        gutterBottom
-        sx={{
-          fontWeight: 600,
-          color: 'primary.main',
-          mb: { xs: 2, sm: 3 }
-        }}
-      >
-        Reservations ({reservationsWithDetails.length})
-      </Typography>
-
       <MobileView />
       <DesktopView />
 

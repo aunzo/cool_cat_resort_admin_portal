@@ -326,12 +326,9 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
           placeholder="ค้นหาห้องพัก..."
           value={globalFilter ?? ''}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          sx={{ maxWidth: 400 }}
+          sx={{ width: '100%' }}
           size="small"
         />
-        <Typography variant="body2" color="text.secondary">
-          {table.getFilteredRowModel().rows.length} ห้องพัก
-        </Typography>
       </Box>
       
       {table.getRowModel().rows.length === 0 ? (
@@ -365,8 +362,8 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
                               header.getContext()
                             )}
                         {{
-                          asc: ' 🔼',
-                          desc: ' 🔽',
+                          asc: ' ⬆️',
+                          desc: ' ⬇️',
                         }[header.column.getIsSorted() as string] ?? null}
                       </TableCell>
                     ))}
@@ -386,9 +383,13 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
               </TableBody>
             </Table>
           </TableContainer>
+          
           {table.getPageCount() > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                แสดง {table.getRowModel().rows.length} จาก {rooms.length} รายการ
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <Button
                   variant="outlined"
                   size="small"
@@ -435,19 +436,6 @@ export default function RoomDataTable({ roomHook }: RoomDataTableProps) {
   return (
     <>
       <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
-        <Typography 
-          variant="h5" 
-          component="h2" 
-          gutterBottom
-          sx={{ 
-            fontWeight: 600,
-            color: 'primary.main',
-            mb: { xs: 2, sm: 3 }
-          }}
-        >
-          ห้องพัก ({rooms.length})
-        </Typography>
-        
         <MobileView />
         <DesktopView />
       </Paper>

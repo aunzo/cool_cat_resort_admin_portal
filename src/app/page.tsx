@@ -33,6 +33,7 @@ import {
   Hotel,
   Person,
   CalendarToday,
+  AdminPanelSettings,
 } from '@mui/icons-material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
@@ -460,7 +461,7 @@ export default function HomePage() {
           ระบบจัดการ
         </Typography>
         <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6}>
             <Paper 
               elevation={3} 
               sx={{ 
@@ -491,7 +492,7 @@ export default function HomePage() {
             </Paper>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6}>
             <Paper 
               elevation={3} 
               sx={{ 
@@ -522,7 +523,7 @@ export default function HomePage() {
             </Paper>
           </Grid>
           
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6}>
             <Paper 
               elevation={3} 
               sx={{ 
@@ -549,6 +550,37 @@ export default function HomePage() {
                 fullWidth
               >
 จัดการการจอง
+              </Button>
+            </Paper>
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <Paper 
+              elevation={3} 
+              sx={{ 
+                p: 4, 
+                textAlign: 'center',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-4px)'
+                }
+              }}
+            >
+              <AdminPanelSettings sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h5" gutterBottom>
+                จัดการผู้ใช้
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                จัดการผู้ใช้และข้อมูลผู้ใช้
+              </Typography>
+              <Button 
+                component={Link} 
+                href="/users" 
+                variant="contained" 
+                size="large"
+                fullWidth
+              >
+จัดการผู้ใช้
               </Button>
             </Paper>
           </Grid>

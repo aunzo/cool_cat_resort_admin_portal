@@ -22,15 +22,18 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 type UserFormData = z.infer<typeof CreateUserSchema>
+type UseUsersReturn = ReturnType<typeof useUsers>
 
 interface UserFormProps {
+  userHook?: UseUsersReturn
   user?: User | null
   onSuccess?: () => void
   onCancel?: () => void
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user, onSuccess, onCancel }) => {
-  const { createUser, updateUser, loading, error } = useUsers()
+const UserForm: React.FC<UserFormProps> = ({ userHook, user, onSuccess, onCancel }) => {
+  const fallbackHook = useUsers()
+  const { createUser, updateUser, loading, error } = userHook || fallbackHook
   const [formData, setFormData] = useState<UserFormData>({
     username: '',
     password: '',

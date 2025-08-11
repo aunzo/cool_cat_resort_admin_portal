@@ -10,145 +10,179 @@ import {
   flexRender,
 } from '@tanstack/react-table'
 import {
-  Paper,
+  Box,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
+  Paper,
+  TextField,
   Typography,
-  Box,
-  Alert,
   CircularProgress,
+  Alert,
+  Card,
+  CardContent,
+  Stack,
+  IconButton,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
-  useTheme,
-  useMediaQuery,
-  Card,
-  CardContent,
-  Stack,
-  TextField,
   Tooltip,
   Chip,
 } from '@mui/material'
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon,
-  FirstPage,
-  LastPage,
-  NavigateBefore,
-  NavigateNext,
 } from '@mui/icons-material'
-import { User } from '@/types/user'
 import { useUsers } from '@/hooks/useUsers'
+import { User } from '@/types/user'
 import UserForm from './UserForm'
-import { format } from 'date-fns'
-import { th } from 'date-fns/locale'
 
-const UserDataTable: React.FC = () => {
-  const { users, loading, error, deleteUser } = useUsers()
-  const [globalFilter, setGlobalFilter] = useState('')
+type UseUsersReturn = ReturnType<typeof useUsers>
+
+interface UserDataTableProps {
+  userHook?: UseUsersReturn
+}
+
+export default function UserDataTable({ userHook }: UserDataTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [deletingUser, setDeletingUser] = useState<User | null>(null)
-  const [showForm, setShowForm] = useState(false)
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [globalFilter, setGlobalFilter] = useState('')
+  const fallbackHook = useUsers()
+  const { users, loading, error } = userHook || fallbackHook
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'ผู้ดูแลระบบ'
-      case 'staff': return 'พนักงาน'
-      case 'manager': return 'ผู้จัดการ'
-      default: return role
+      case 'ADMIN':
+        return 'ผู้ดูแลระบบ'
+      case 'STAFF':
+        return 'พนักงาน'
+      default:
+        return role
     }
   }
 
-  const getRoleColor = (role: string): 'primary' | 'secondary' | 'success' | 'warning' | 'error' => {
+  const getRoleColor = (role: string): 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' => {
     switch (role) {
-      case 'admin': return 'error'
-      case 'manager': return 'warning'
-      case 'staff': return 'primary'
-      default: return 'secondary'
+      case 'ADMIN':
+        return 'error'
+      case 'STAFF':
+        return 'primary'
+      default:
+        return 'secondary'
     }
   }
 
-  const columns = useMemo<ColumnDef<User>[]>(() => [
-    {
-      accessorKey: 'username',
-      header: 'ชื่อผู้ใช้',
-      cell: ({ row }) => (
-        <Typography variant="body2" fontWeight="medium">
-          {row.original.username}
-        </Typography>
-      ),
-    },
-    {
-      accessorKey: 'name',
-      header: 'ชื่อ-นามสกุล',
-      cell: ({ row }) => (
-        <Typography variant="body2">
-          {row.original.name}
-        </Typography>
-      ),
-    },
-    {
-      accessorKey: 'role',
-      header: 'บทบาท',
-      cell: ({ row }) => (
-        <Chip
-          label={getRoleLabel(row.original.role)}
-          color={getRoleColor(row.original.role)}
-          size="small"
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'วันที่สร้าง',
-      cell: ({ row }) => (
-        <Typography variant="body2" color="text.secondary">
-          {format(new Date(row.original.createdAt), 'dd/MM/yyyy HH:mm', { locale: th })}
-        </Typography>
-      ),
-    },
-    {
-      id: 'actions',
-      header: 'จัดการ',
-      cell: ({ row }) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Tooltip title="แก้ไข">
-            <IconButton
-              size="small"
-              onClick={() => {
-                setEditingUser(row.original)
-                setShowForm(true)
-              }}
-              color="primary"
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="ลบ">
-            <IconButton
-              size="small"
-              onClick={() => setDeletingUser(row.original)}
-              color="error"
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
-    },
-  ], [])
+  // Handler functions for actions
+  const handleEdit = (user: User) => {
+    setEditingUser(user)
+  }
 
+  const handleEditComplete = () => {
+    setEditingUser(null)
+  }
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return
+
+    setIsDeleting(true)
+    try {
+      await (userHook || fallbackHook).deleteUser(userToDelete.id)
+      setDeleteConfirmOpen(false)
+      setUserToDelete(null)
+    } catch (error) {
+      console.error('Error deleting user:', error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false)
+    setUserToDelete(null)
+  }
+
+  // TanStack Table columns definition
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'ชื่อ',
+        cell: (info) => (
+          <Typography variant="body2" fontWeight="medium">
+            {info.getValue() as string}
+          </Typography>
+        ),
+      },
+      {
+        accessorKey: 'username',
+        header: 'ชื่อผู้ใช้',
+        cell: (info) => (
+          <Typography variant="body2" color="text.secondary">
+            {info.getValue() as string}
+          </Typography>
+        ),
+      },
+      {
+        accessorKey: 'role',
+        header: 'บทบาท',
+        cell: (info) => {
+          const role = info.getValue() as string
+          return (
+            <Chip
+              label={getRoleLabel(role)}
+              color={getRoleColor(role)}
+              size="small"
+              sx={{ fontWeight: 500 }}
+            />
+          )
+        },
+      },
+      {
+        id: 'actions',
+        header: 'การดำเนินการ',
+        cell: (info) => {
+          const user = info.row.original
+          return (
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Tooltip title="แก้ไข">
+                <IconButton
+                  size="small"
+                  onClick={() => handleEdit(user)}
+                  color="primary"
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="ลบ">
+                <IconButton
+                  size="small"
+                  onClick={() => handleDeleteClick(user)}
+                  color="error"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )
+        },
+      },
+    ],
+    []
+  )
+
+  // TanStack Table configuration
   const table = useReactTable({
     data: users,
     columns,
@@ -168,267 +202,324 @@ const UserDataTable: React.FC = () => {
     },
   })
 
-  const handleDeleteConfirm = async () => {
-    if (deletingUser) {
-      try {
-        await deleteUser(deletingUser.id)
-        setDeletingUser(null)
-      } catch (error) {
-        // Error is handled by the hook
-      }
-    }
-  }
-
-  const handleFormSuccess = () => {
-    setShowForm(false)
-    setEditingUser(null)
-  }
-
-  const handleFormCancel = () => {
-    setShowForm(false)
-    setEditingUser(null)
-  }
-
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+      <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
         <CircularProgress />
-      </Box>
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          กำลังโหลดผู้ใช้...
+        </Typography>
+      </Paper>
     )
   }
 
   if (error) {
     return (
-      <Alert severity="error">
-        {error}
-      </Alert>
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <Alert severity="error">
+          {error}
+        </Alert>
+      </Paper>
     )
   }
 
-  if (isMobile) {
-    return (
-      <Box>
-        {/* Search */}
-        <TextField
-          fullWidth
-          placeholder="ค้นหาผู้ใช้..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-          }}
-          sx={{ mb: 2 }}
-        />
-
-        {/* Mobile Cards */}
-        <Stack spacing={2}>
-          {table.getRowModel().rows.map((row) => (
-            <Card key={row.id} variant="outlined">
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                  <Typography variant="h6" component="div">
-                    {row.original.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        setEditingUser(row.original)
-                        setShowForm(true)
-                      }}
-                      color="primary"
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => setDeletingUser(row.original)}
-                      color="error"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </Box>
-                
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  ชื่อผู้ใช้: {row.original.username}
-                </Typography>
-                
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                  <Chip
-                    label={getRoleLabel(row.original.role)}
-                    color={getRoleColor(row.original.role)}
-                    size="small"
-                    variant="outlined"
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {format(new Date(row.original.createdAt), 'dd/MM/yyyy', { locale: th })}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
-        </Stack>
-
-        {/* Mobile Pagination */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 3, gap: 1 }}>
-          <IconButton
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <FirstPage />
-          </IconButton>
-          <IconButton
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <NavigateBefore />
-          </IconButton>
-          
-          <Typography variant="body2" sx={{ mx: 2 }}>
-            หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
-          </Typography>
-          
-          <IconButton
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <NavigateNext />
-          </IconButton>
-          <IconButton
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <LastPage />
-          </IconButton>
-        </Box>
-      </Box>
-    )
-  }
-
-  return (
-    <Box>
-      {/* Search */}
+  // Mobile card view
+  const MobileView = () => (
+    <Box sx={{ display: { xs: 'block', md: 'none' } }}>
       <TextField
         fullWidth
+        variant="outlined"
         placeholder="ค้นหาผู้ใช้..."
-        value={globalFilter}
+        value={globalFilter ?? ''}
         onChange={(e) => setGlobalFilter(e.target.value)}
-        InputProps={{
-          startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-        }}
         sx={{ mb: 2 }}
+        size="small"
       />
-
-      {/* Desktop Table */}
-      <TableContainer component={Paper} variant="outlined">
-        <Table>
-          <TableHead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell
-                    key={header.id}
-                    sx={{ fontWeight: 'bold', backgroundColor: 'grey.50' }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} hover>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Desktop Pagination */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-        <Typography variant="body2" color="text.secondary">
-          แสดง {table.getRowModel().rows.length} จาก {users.length} รายการ
-        </Typography>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <FirstPage />
-          </IconButton>
-          <IconButton
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <NavigateBefore />
-          </IconButton>
-          
-          <Typography variant="body2" sx={{ mx: 2 }}>
-            หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+      {table.getRowModel().rows.length === 0 ? (
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {users.length === 0 ? 'ไม่พบผู้ใช้ เพิ่มผู้ใช้แรกด้านบน' : 'ไม่พบผู้ใช้ที่ตรงกับการค้นหา'}
           </Typography>
-          
-          <IconButton
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <NavigateNext />
-          </IconButton>
-          <IconButton
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <LastPage />
-          </IconButton>
         </Box>
+      ) : (
+        <>
+          {table.getRowModel().rows.map((row) => {
+            const user = row.original
+            return (
+              <Card key={user.id} sx={{ mb: 2, borderRadius: 2 }}>
+                <CardContent sx={{ pb: 2 }}>
+                  <Stack spacing={2}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                      {user.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      @{user.username}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Chip
+                        label={getRoleLabel(user.role)}
+                        color={getRoleColor(user.role)}
+                        size="small"
+                        sx={{ fontWeight: 500 }}
+                      />
+                    </Box>
+                    <Box sx={{
+                      display: 'flex',
+                      gap: 2,
+                      mt: 2,
+                      justifyContent: 'flex-end'
+                    }}>
+                      <Button
+                        size="medium"
+                        variant="outlined"
+                        onClick={() => handleEdit(user)}
+                        color="primary"
+                        startIcon={<EditIcon />}
+                        sx={{
+                          minHeight: 44,
+                          px: 3,
+                          borderRadius: 2
+                        }}
+                      >
+                        แก้ไข
+                      </Button>
+                      <Button
+                        size="medium"
+                        variant="outlined"
+                        onClick={() => handleDeleteClick(user)}
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        sx={{
+                          minHeight: 44,
+                          px: 3,
+                          borderRadius: 2
+                        }}
+                      >
+                        ลบ
+                      </Button>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )
+          })}
+          {table.getPageCount() > 1 && (
+            <Box sx={{ mt: 3 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign="center"
+                sx={{ mb: 2 }}
+              >
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+              </Typography>
+              <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 2,
+                flexWrap: 'wrap'
+              }}>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'<<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'>'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                  sx={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {'>>'}
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </>
+      )}
+    </Box>
+  )
+
+  // Desktop table view
+  const DesktopView = () => (
+    <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <TextField
+          variant="outlined"
+          placeholder="ค้นหาผู้ใช้..."
+          value={globalFilter ?? ''}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          sx={{ width: '100%' }}
+          size="small"
+        />
       </Box>
 
-      {/* Edit/Create Form Dialog */}
-      <Dialog
-        open={showForm}
-        onClose={handleFormCancel}
-        maxWidth="sm"
-        fullWidth
-        fullScreen={isMobile}
-      >
+      {table.getRowModel().rows.length === 0 ? (
+        <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {users.length === 0 ? 'ไม่พบห้องพัก เพิ่มห้องพักแรกด้านบน' : 'ไม่พบห้องพักที่ตรงกับการค้นหา'}
+          </Typography>
+        </Box>
+      ) : (
+        <>
+          <TableContainer component={Paper} elevation={1}>
+            <Table>
+              <TableHead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableCell
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        sx={{
+                          cursor: header.column.getCanSort() ? 'pointer' : 'default',
+                          userSelect: 'none',
+                          fontWeight: 600,
+                          backgroundColor: 'grey.50',
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        {{
+                          asc: ' ⬆️',
+                          desc: ' ⬇️',
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} hover>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {table.getRowModel().rows.length > 0 && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                แสดง {table.getRowModel().rows.length} จาก {users.length} รายการ
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {'<'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>'}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {'>>'}
+                </Button>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                หน้า {table.getState().pagination.pageIndex + 1} จาก {table.getPageCount()}
+              </Typography>
+            </Box>
+          )}
+        </>
+      )}
+    </Box>
+  )
+
+  return (
+    <>
+      <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
+        <MobileView />
+        <DesktopView />
+      </Paper>
+
+      {/* Edit User Dialog */}
+      <Dialog open={!!editingUser} onClose={handleEditComplete} maxWidth="sm" fullWidth>
         <DialogContent sx={{ p: 0 }}>
           <UserForm
-            user={editingUser}
-            onSuccess={handleFormSuccess}
-            onCancel={handleFormCancel}
+            user={editingUser || undefined}
+            onSuccess={async () => {
+              await (userHook || fallbackHook).refreshUsers()
+              handleEditComplete()
+            }}
+            onCancel={handleEditComplete}
           />
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!deletingUser} onClose={() => setDeletingUser(null)}>
+      <Dialog open={deleteConfirmOpen} onClose={handleDeleteCancel}>
         <DialogTitle>ยืนยันการลบ</DialogTitle>
         <DialogContent>
           <Typography>
-            คุณต้องการลบผู้ใช้ "{deletingUser?.name}" หรือไม่?
+            คุณแน่ใจหรือไม่ที่จะลบผู้ใช้ "{userToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeletingUser(null)}>ยกเลิก</Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            ลบ
+          <Button onClick={handleDeleteCancel}>ยกเลิก</Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            disabled={isDeleting}
+            startIcon={isDeleting ? <CircularProgress size={16} /> : undefined}
+          >
+            {isDeleting ? 'กำลังลบ...' : 'ลบ'}
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </>
   )
 }
-
-export default UserDataTable

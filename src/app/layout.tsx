@@ -12,8 +12,8 @@ const sarabun = Sarabun({
 })
 
 export const metadata: Metadata = {
-  title: 'Cool Cat Resort - Backoffice',
-  description: 'Backoffice management system for Cool Cat Resort',
+  title: 'ครู แคท รีสอร์ท - ระบบหลังบ้าน',
+  description: 'ระบบจัดการหลังบ้านสำหรับครู แคท รีสอร์ท',
 }
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="th">
       <body className={sarabun.className}>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>

@@ -23,87 +23,81 @@ import UserDataTable from '@/app/components/UserDataTable'
 import { useUsers } from '@/hooks/useUsers'
 import Link from 'next/link'
 
-const UsersPage: React.FC = () => {
-  const [showForm, setShowForm] = useState(false)
-  const { users, loading } = useUsers()
+export default function UsersPage() {
+  const [userFormOpen, setUserFormOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
-  const handleFormSuccess = () => {
-    setShowForm(false)
-  }
+  const userHook = useUsers()
 
   return (
-    <AppLayout>
-      <Container maxWidth="xl" sx={{ py: 3 }}>
-        {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Link href="/" passHref>
-              <Button
-                startIcon={<ArrowBack />}
-                sx={{ mr: 2 }}
-                color="inherit"
-              >
-                กลับหน้าหลัก
-              </Button>
-            </Link>
-            <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-              จัดการผู้ใช้
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => setShowForm(!showForm)}
-              sx={{ ml: 2 }}
-            >
-              เพิ่มผู้ใช้
-            </Button>
+    <AppLayout title="User Management - Cool Cat Resort">
+      <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 } }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: { xs: 3, sm: 4 } }}>
+        <Typography 
+          variant={isMobile ? "h4" : "h3"} 
+          component="h1" 
+          sx={{ 
+            fontWeight: 700,
+            color: 'primary.main',
+            textAlign: { xs: 'center', sm: 'left' },
+            flex: 1
+          }}
+        >
+          จัดการผู้ใช้
+        </Typography>
+        <Button
+            component={Link}
+            href="/"
+            variant="outlined"
+            startIcon={<ArrowBack />}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 'medium'
+            }}
+          >
+            กลับหน้าหลัก
+          </Button>
+      </Box>
+      
+      {/* Mobile Layout */}
+      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+        <Paper elevation={1} sx={{ mb: 3 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => setUserFormOpen(!userFormOpen)}
+            startIcon={<Add />}
+            endIcon={userFormOpen ? <ExpandLess /> : <ExpandMore />}
+            sx={{ 
+              p: 2,
+              justifyContent: 'space-between',
+              textTransform: 'none',
+              fontSize: '1.1rem'
+            }}
+          >
+            เพิ่มผู้ใช้ใหม่
+          </Button>
+        </Paper>
+        
+        <Collapse in={userFormOpen}>
+          <Box mb={3}>
+            <UserForm userHook={userHook} />
           </Box>
-          
-          <Typography variant="body1" color="text.secondary">
-            จัดการข้อมูลผู้ใช้ระบบ เพิ่ม แก้ไข และลบผู้ใช้
-          </Typography>
+        </Collapse>
+        
+        <UserDataTable userHook={userHook} />
+      </Box>
+      
+      {/* Desktop Layout */}
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Box sx={{ mb: 3 }}>
+          <UserForm userHook={userHook} />
         </Box>
-
-        <Grid container spacing={3}>
-          {/* Add User Form */}
-          <Grid item xs={12}>
-            <Collapse in={showForm}>
-              <Box sx={{ mb: 3 }}>
-                <UserForm
-                  onSuccess={handleFormSuccess}
-                  onCancel={() => setShowForm(false)}
-                />
-              </Box>
-            </Collapse>
-          </Grid>
-
-          {/* Users Table */}
-          <Grid item xs={12}>
-            <Paper elevation={2} sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6">
-                  รายการผู้ใช้ ({loading ? '...' : users.length} คน)
-                </Typography>
-                {!isMobile && (
-                  <Button
-                    variant="outlined"
-                    startIcon={showForm ? <ExpandLess /> : <ExpandMore />}
-                    onClick={() => setShowForm(!showForm)}
-                  >
-                    {showForm ? 'ซ่อนฟอร์ม' : 'แสดงฟอร์มเพิ่มผู้ใช้'}
-                  </Button>
-                )}
-              </Box>
-              
-              <UserDataTable />
-            </Paper>
-          </Grid>
-        </Grid>
+        
+        <UserDataTable userHook={userHook} />
+      </Box>
       </Container>
     </AppLayout>
   )
 }
-
-export default UsersPage
