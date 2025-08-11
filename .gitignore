@@ -37,3 +37,4 @@ next-env.d.ts
 
 # Custom additions
 /generated/prisma
+.next/

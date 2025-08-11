@@ -3,6 +3,7 @@ import { Sarabun } from 'next/font/google'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import SessionProviderWrapper from '../components/SessionProviderWrapper'
 import theme from './theme'
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         </SessionProviderWrapper>
           </ThemeProvider>
         </AppRouterCacheProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
