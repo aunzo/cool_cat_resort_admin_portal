@@ -17,12 +17,12 @@ const theme = createTheme({
       contrastText: '#ffffff',
     },
     background: {
-      default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      default: '#ffffff',
       paper: 'rgba(255, 255, 255, 0.25)',
     },
     text: {
-      primary: '#ffffff',
-      secondary: 'rgba(255, 255, 255, 0.85)',
+      primary: '#1a1a1a',
+      secondary: '#333333',
     },
   },
   typography: {
@@ -74,8 +74,8 @@ const theme = createTheme({
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255, 255, 255, 0.2)',
           borderRadius: '12px',
-          color: '#ffffff',
-           textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+          color: '#1a1a1a',
+           textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
           transition: 'all 0.3s ease',
           minHeight: 44,
           '&:hover': {
@@ -92,8 +92,8 @@ const theme = createTheme({
            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%)',
            backdropFilter: 'blur(20px)',
            border: '1px solid rgba(255, 255, 255, 0.3)',
-           color: '#ffffff',
-           textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+           color: '#1a1a1a',
+           textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
            '&:hover': {
              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.35) 100%)',
            },
@@ -108,7 +108,7 @@ const theme = createTheme({
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             borderRadius: '12px',
-            color: '#ffffff',
+            color: '#1a1a1a',
             '&:hover': {
               background: 'rgba(255, 255, 255, 0.3)',
               border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -123,9 +123,9 @@ const theme = createTheme({
             },
           },
           '& .MuiInputLabel-root': {
-            color: 'rgba(255, 255, 255, 0.9)',
+            color: '#1a1a1a',
             '&.Mui-focused': {
-              color: '#ffffff',
+              color: '#1a1a1a',
             },
           },
           '& .MuiOutlinedInput-notchedOutline': {
@@ -142,7 +142,7 @@ const theme = createTheme({
           borderRadius: '8px',
           margin: '4px 0',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          color: '#ffffff',
+          color: '#1a1a1a',
           minHeight: 48,
           '&:hover': {
             background: 'rgba(255, 255, 255, 0.3)',
@@ -161,7 +161,7 @@ const theme = createTheme({
           background: 'rgba(255, 255, 255, 0.2)',
           backdropFilter: 'blur(5px)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          color: '#ffffff',
+          color: '#1a1a1a',
           '@media (max-width:600px)': {
             padding: '8px 4px',
             fontSize: '0.875rem',
@@ -171,8 +171,8 @@ const theme = createTheme({
           background: 'rgba(255, 255, 255, 0.35)',
           backdropFilter: 'blur(15px)',
           fontWeight: 600,
-          color: '#ffffff',
-          textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+          color: '#1a1a1a',
+          textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
         },
       },
     },
