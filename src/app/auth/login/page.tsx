@@ -124,17 +124,20 @@ export default function LoginPage() {
           sx={{
             borderRadius: 4,
             overflow: 'hidden',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
+            background: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
           }}
         >
           <Box
             sx={{
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%)',
+              backdropFilter: 'blur(15px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
               p: 4,
               textAlign: 'center',
-              color: 'white'
+              color: '#1a1a1a'
             }}
           >
             <Box sx={{ mb: 2 }}>
@@ -146,10 +149,10 @@ export default function LoginPage() {
                 style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }}
               />
             </Box>
-            <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}>
               Cool Cat House
             </Typography>
-            <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+            <Typography variant="subtitle1" sx={{ color: '#333333', textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}>
               ยินดีต้อนรับ! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ
             </Typography>
           </Box>
@@ -193,13 +196,31 @@ export default function LoginPage() {
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#2563eb',
+                    color: '#1a1a1a',
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#2563eb',
+                    '&.Mui-focused': {
+                      background: 'rgba(255, 255, 255, 0.4)',
+                      border: '1px solid rgba(255, 255, 255, 0.4)',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
                     },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#1a1a1a',
+                    textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
+                    '&.Mui-focused': {
+                      color: '#1a1a1a',
+                    },
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a',
+                    textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
                   },
                 }}
               />
@@ -236,13 +257,31 @@ export default function LoginPage() {
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#2563eb',
+                    color: '#1a1a1a',
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
                     },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#2563eb',
+                    '&.Mui-focused': {
+                      background: 'rgba(255, 255, 255, 0.4)',
+                      border: '1px solid rgba(255, 255, 255, 0.4)',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
                     },
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#1a1a1a',
+                    textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
+                    '&.Mui-focused': {
+                      color: '#1a1a1a',
+                    },
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#1a1a1a',
+                    textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
                   },
                 }}
               />
@@ -258,18 +297,24 @@ export default function LoginPage() {
                   mb: 2,
                   py: 1.5,
                   borderRadius: 2,
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                  boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: '#1a1a1a',
+                  textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
                   textTransform: 'none',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
-                    boxShadow: '0 6px 20px rgba(37, 99, 235, 0.4)',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.35) 100%)',
+                    backdropFilter: 'blur(25px)',
+                    boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
                     transform: 'translateY(-1px)'
                   },
                   '&:disabled': {
-                    background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%)',
+                    color: 'rgba(26, 26, 26, 0.5)'
                   },
                   transition: 'all 0.2s ease-in-out'
                 }}
@@ -288,7 +333,7 @@ export default function LoginPage() {
             <Divider sx={{ my: 3 }} />
             
             <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{ color: '#333333', textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}>
                 การเข้าถึงผู้ดูแลระบบที่ปลอดภัย • ระบบจัดการ Cool Cat House
               </Typography>
             </Box>
