@@ -26,7 +26,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
   useTheme,
   useMediaQuery,
   Card,
@@ -35,6 +34,7 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material'
+import Button from '@/components/Button'
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,

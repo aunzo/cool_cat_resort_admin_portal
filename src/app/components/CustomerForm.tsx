@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react'
 import {
   Box,
   TextField,
-  Button,
   Paper,
   Typography,
   Alert,
   CircularProgress,
 } from '@mui/material'
+import Button from '@/components/Button'
 import { Customer, CreateCustomerData, CustomerFormSchema } from '@/types/customer'
 import { useCustomers } from '@/hooks/useCustomers'
 import { z } from 'zod'

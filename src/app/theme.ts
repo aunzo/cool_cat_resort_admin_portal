@@ -5,24 +5,13 @@ const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#667eea', // Soft blue-purple gradient start
-      light: '#764ba2', // Gradient end
-      dark: '#4c63d2',
-      contrastText: '#ffffff',
+      main: '#1995AD',
     },
     secondary: {
-      main: '#f093fb', // Pink gradient start
-      light: '#f5576c', // Gradient end
-      dark: '#c471ed',
-      contrastText: '#ffffff',
+      main: '#A1D6E2',
     },
     background: {
-      default: '#ffffff',
-      paper: 'rgba(255, 255, 255, 0.25)',
-    },
-    text: {
-      primary: '#1a1a1a',
-      secondary: '#333333',
+      default: '#FFFFFF',
     },
   },
   typography: {
@@ -57,79 +46,26 @@ const theme = createTheme({
     },
   },
   components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          backgroundAttachment: 'fixed',
-          minHeight: '100vh',
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
-          background: 'rgba(255, 255, 255, 0.35)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '12px',
-          color: '#1a1a1a',
-           textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
-          transition: 'all 0.3s ease',
+          // Better touch targets for mobile
           minHeight: 44,
-          '&:hover': {
-             background: 'rgba(255, 255, 255, 0.4)',
-            backdropFilter: 'blur(15px)',
-            transform: 'translateY(-2px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          },
           '@media (max-width:600px)': {
             minHeight: 48,
           },
         },
-        contained: {
-           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%)',
-           backdropFilter: 'blur(20px)',
-           border: '1px solid rgba(255, 255, 255, 0.3)',
-           color: '#1a1a1a',
-           textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
-           '&:hover': {
-             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.35) 100%)',
-           },
-         },
       },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
+          // Better touch targets for mobile inputs
           '& .MuiInputBase-root': {
-            background: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            borderRadius: '12px',
-            color: '#1a1a1a',
-            '&:hover': {
-              background: 'rgba(255, 255, 255, 0.3)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-            },
-            '&.Mui-focused': {
-              background: 'rgba(255, 255, 255, 0.4)',
-              border: '1px solid rgba(255, 255, 255, 0.4)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-            },
             '@media (max-width:600px)': {
               minHeight: 48,
             },
-          },
-          '& .MuiInputLabel-root': {
-            color: '#1a1a1a',
-            '&.Mui-focused': {
-              color: '#1a1a1a',
-            },
-          },
-          '& .MuiOutlinedInput-notchedOutline': {
-            border: 'none',
           },
         },
       },
@@ -137,18 +73,8 @@ const theme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          background: 'rgba(255, 255, 255, 0.2)',
-          backdropFilter: 'blur(5px)',
-          borderRadius: '8px',
-          margin: '4px 0',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          color: '#1a1a1a',
+          // Better touch targets for navigation
           minHeight: 48,
-          '&:hover': {
-            background: 'rgba(255, 255, 255, 0.3)',
-            backdropFilter: 'blur(10px)',
-            transform: 'translateX(4px)',
-          },
           '@media (max-width:600px)': {
             minHeight: 56,
           },
@@ -158,72 +84,21 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          background: 'rgba(255, 255, 255, 0.2)',
-          backdropFilter: 'blur(5px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          color: '#1a1a1a',
+          // Better spacing for mobile tables
           '@media (max-width:600px)': {
             padding: '8px 4px',
             fontSize: '0.875rem',
           },
-        },
-        head: {
-          background: 'rgba(255, 255, 255, 0.35)',
-          backdropFilter: 'blur(15px)',
-          fontWeight: 600,
-          color: '#1a1a1a',
-          textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)',
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          background: 'rgba(255, 255, 255, 0.25)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            background: 'rgba(255, 255, 255, 0.3)',
-            backdropFilter: 'blur(25px)',
-            transform: 'translateY(-4px)',
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)',
-          },
+          // Better mobile card styling
           '@media (max-width:600px)': {
-            borderRadius: 12,
+            borderRadius: 8,
           },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          background: 'rgba(255, 255, 255, 0.25)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          background: 'rgba(255, 255, 255, 0.25)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          background: 'rgba(255, 255, 255, 0.25)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
         },
       },
     },

@@ -26,7 +26,6 @@ import {
   CardContent,
   Stack,
   IconButton,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -34,6 +33,7 @@ import {
   Tooltip,
   Chip,
 } from '@mui/material'
+import Button from '@/components/Button'
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react'
 import {
   Box,
   TextField,
-  Button,
   Paper,
   Typography,
   Alert,
@@ -15,7 +14,8 @@ import {
   InputAdornment,
   IconButton,
 } from '@mui/material'
-import { User, CreateUserData, CreateUserSchema } from '@/types/user'
+import Button from '@/components/Button'
+import { User, CreateUserSchema } from '@/types/user'
 import { useUsers } from '@/hooks/useUsers'
 import { z } from 'zod'
 import VisibilityIcon from '@mui/icons-material/Visibility'

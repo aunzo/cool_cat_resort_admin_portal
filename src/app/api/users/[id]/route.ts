@@ -44,6 +44,28 @@ export async function PUT(
   try {
     const data: UpdateUserData & { password?: string } = await request.json()
     
+    // If username is being updated, check for conflicts (case-insensitive)
+    if (data.username) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          username: {
+            equals: data.username,
+            mode: 'insensitive'
+          },
+          NOT: {
+            id: params.id
+          }
+        }
+      })
+      
+      if (existingUser) {
+        return NextResponse.json(
+          { error: 'A user with this username already exists' },
+          { status: 409 }
+        )
+      }
+    }
+    
     // If password is being updated, hash it
     const updateData: any = { ...data }
     if (data.password) {

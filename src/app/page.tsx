@@ -4,7 +4,6 @@ import {
   Container,
   Typography,
   Box,
-  Button,
   Grid,
   Card,
   CardContent,
@@ -26,6 +25,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import Button from '@/components/Button'
 import {
   AttachMoney,
   EventAvailable,
@@ -363,13 +363,12 @@ export default function HomePage() {
           {/* Calendar View */}
           <Grid container spacing={3}>
             <Grid item xs={12} md={4}>
-              <Paper elevation={3} sx={{ p: 3, height: 400, overflow: 'auto' }}>
+              <Paper elevation={3} sx={{ p: 3, height: 500, overflow: 'auto' }}>
                 <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main', mb: 3 }}>
                   ปฏิทินการจอง
                 </Typography>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateCalendar
-                    showDaysOutsideCurrentMonth
                     slots={{
                       day: CustomDay,
                     }}
@@ -395,7 +394,7 @@ export default function HomePage() {
             </Grid>
             
             <Grid item xs={12} md={8}>
-              <Paper elevation={3} sx={{ p: 3, height: 400, overflow: 'auto' }}>
+              <Paper elevation={3} sx={{ p: 3, height: 500, overflow: 'auto' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                   <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
                     การจองล่าสุด

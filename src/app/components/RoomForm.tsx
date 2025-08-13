@@ -5,13 +5,13 @@ import {
   Paper,
   Typography,
   TextField,
-  Button,
   Grid,
   Alert,
   useTheme,
   useMediaQuery,
   CircularProgress,
 } from '@mui/material'
+import Button from '@/components/Button'
 import { useRooms } from '@/hooks/useRooms'
 import { RoomFormSchema, CreateRoomData, Room } from '@/types/room'
 import { z } from 'zod'

@@ -27,7 +27,6 @@ import {
   Card,
   CardContent,
   Stack,
-  Button,
   IconButton,
   Tooltip,
   Dialog,
@@ -36,6 +35,7 @@ import {
   DialogActions,
   DialogContentText,
 } from '@mui/material'
+import Button from '@/components/Button'
 import { Edit, Delete, Visibility } from '@mui/icons-material'
 import { useReservations } from '@/hooks/useReservations'
 import { ReservationWithDetails } from '@/types/reservation'

@@ -4,11 +4,11 @@ import {
   Container,
   Typography,
   Box,
-  Button,
   Paper,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
+import Button from '@/components/Button'
 import Link from 'next/link'
 import { ArrowBack } from '@mui/icons-material'
 import AppLayout from '@/app/components/AppLayout'

@@ -6,7 +6,6 @@ import {
   Typography,
   AppBar,
   Toolbar,
-  Button,
   IconButton,
   Drawer,
   List,
@@ -22,6 +21,7 @@ import {
   Avatar,
   CircularProgress,
 } from '@mui/material'
+import Button from '@/components/Button'
 import {
   Hotel,
   Person,
@@ -118,7 +118,7 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #1f2937 0%, #374151 25%, #4f46e5 50%, #7c3aed 75%, #a855f7 100%)',
+          background: 'linear-gradient(135deg, #1995AD 0%, #A1D6E2 100%)',
           color: 'white',
         }}
       >
@@ -171,6 +171,7 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
                   primary={item.text}
                   primaryTypographyProps={{
                     fontWeight: 500,
+                    color: 'text.primary',
                   }}
                 />
               </ListItemButton>
@@ -233,7 +234,7 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
       <AppBar
         position="static"
         sx={{
-          background: 'linear-gradient(135deg, #1f2937 0%, #374151 25%, #4f46e5 50%, #7c3aed 75%, #a855f7 100%)',
+          background: 'linear-gradient(135deg, #147a8f 0%, #2a9d8f 100%)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
           margin: '16px',
           borderRadius: '16px',
@@ -301,21 +302,17 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
                   <Button
                     startIcon={item.icon}
                     sx={{
-                      color: 'white',
+                      color: 'white !important',
                       px: 3,
                       py: 1,
                       borderRadius: 2,
                       textTransform: 'none',
-                      fontWeight: 600,
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                      backgroundColor: 'rgba(0,0,0,0.2)',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      transition: 'all 0.3s ease',
+                      fontWeight: 500,
+                      backgroundColor: 'transparent',
+                      border: 'none',
                       '&:hover': {
-                        backgroundColor: 'rgba(0,0,0,0.4)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                        textShadow: '2px 2px 6px rgba(0,0,0,0.9)',
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        color: 'white !important',
                       },
                     }}
                   >
@@ -326,18 +323,18 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
               
               {/* User Menu */}
               {session && (
-                <Box sx={{ ml: 2 }}>
+                <Box sx={{ ml: 2, border: '2px solid white', borderRadius: 16 }}>
                   <IconButton
                     onClick={handleUserMenuOpen}
                     sx={{
                       color: 'white',
-                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      backgroundColor: 'primary.main',
                       '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        backgroundColor: 'secondary.main',
                       },
                     }}
                   >
-                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
+                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'transparent' }}>
                       {session.user.name?.charAt(0).toUpperCase()}
                     </Avatar>
                   </IconButton>
@@ -400,11 +397,8 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
            px: { xs: 2, md: 3 },
            mx: 2,
            my: 2,
-           background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
            minHeight: 'calc(100vh - 200px)',
            maxHeight: 'calc(100vh - 200px)',
-           borderRadius: '12px',
-           boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
            overflow: 'auto',
            width: 'calc(100% - 32px)',
          }}

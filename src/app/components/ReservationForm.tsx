@@ -5,7 +5,6 @@ import {
   Paper,
   Typography,
   TextField,
-  Button,
   Grid,
   Alert,
   useTheme,
@@ -25,6 +24,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@mui/material'
+import Button from '@/components/Button'
 import { useReservations } from '@/hooks/useReservations'
 import { useCustomers } from '@/hooks/useCustomers'
 import { useRooms } from '@/hooks/useRooms'

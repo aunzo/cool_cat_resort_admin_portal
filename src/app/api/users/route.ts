@@ -54,6 +54,23 @@ export async function POST(request: NextRequest) {
   try {
     const data: CreateUserData = await request.json()
     
+    // Check if username already exists (case-insensitive)
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        username: {
+          equals: data.username,
+          mode: 'insensitive'
+        }
+      }
+    })
+    
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'A user with this username already exists' },
+        { status: 409 }
+      )
+    }
+    
     // Hash password
     const hashedPassword = await bcrypt.hash(data.password, 12)
     

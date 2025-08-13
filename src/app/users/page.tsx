@@ -8,9 +8,9 @@ import {
   useTheme,
   useMediaQuery,
   Collapse,
-  Button,
   Paper,
 } from '@mui/material'
+import Button from '@/components/Button'
 import {
   ExpandLess,
   ExpandMore,

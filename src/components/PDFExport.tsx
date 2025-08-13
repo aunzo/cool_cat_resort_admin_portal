@@ -6,9 +6,9 @@ import { PictureAsPdf } from '@mui/icons-material'
 import { ReservationWithDetails } from '@/types/reservation'
 import {
   useTheme,
-  useMediaQuery,
-  Button
+  useMediaQuery
 } from '@mui/material'
+import Button from '@/components/Button'
 
 interface PDFExportProps {
   reservation: ReservationWithDetails

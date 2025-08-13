@@ -30,9 +30,14 @@ export const authOptions: NextAuthOptions = {
 
           const { username, password } = validatedFields.data
 
-          // Find user in database
-          const user = await prisma.user.findUnique({
-            where: { username }
+          // Find user in database (case-insensitive)
+          const user = await prisma.user.findFirst({
+            where: { 
+              username: {
+                equals: username,
+                mode: 'insensitive'
+              }
+            }
           })
 
           if (!user) {
