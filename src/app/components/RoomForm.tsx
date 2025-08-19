@@ -5,7 +5,6 @@ import {
   Paper,
   Typography,
   TextField,
-  Grid,
   Alert,
   useTheme,
   useMediaQuery,
@@ -28,7 +27,7 @@ interface RoomFormProps {
 export default function RoomForm({ roomHook, editingRoom, onEditComplete }: RoomFormProps) {
   const [formData, setFormData] = useState<Partial<RoomFormData>>({
     name: editingRoom?.name || '',
-    price: editingRoom?.price || 0,
+    price: editingRoom?.price || 100,
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof RoomFormData, string>>>({})
@@ -166,7 +165,7 @@ export default function RoomForm({ roomHook, editingRoom, onEditComplete }: Room
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
           label="ชื่อห้องพัก"
@@ -176,6 +175,7 @@ export default function RoomForm({ roomHook, editingRoom, onEditComplete }: Room
           helperText={errors.name}
           size={isMobile ? "small" : "medium"}
           required
+          margin="normal"
         />
 
         <TextField
@@ -187,8 +187,9 @@ export default function RoomForm({ roomHook, editingRoom, onEditComplete }: Room
           error={!!errors.price}
           helperText={errors.price}
           size={isMobile ? "small" : "medium"}
-          inputProps={{ min: 0, step: 0.01 }}
+          inputProps={{ min: 100, step: 100 }}
           required
+          margin="normal"
         />
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           <Button
@@ -213,7 +214,7 @@ export default function RoomForm({ roomHook, editingRoom, onEditComplete }: Room
               disabled={isSubmitting}
               sx={{ flex: 1 }}
             >
-            ยกเลิก
+            {editingRoom ? 'ยกเลิก' : 'ล้างข้อมูล'}
             </Button>
         </Box>
       </Box>

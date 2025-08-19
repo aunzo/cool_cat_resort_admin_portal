@@ -2,15 +2,12 @@
 import React, { useState } from 'react'
 import {
   Container,
-  Paper,
   TextField,
   Typography,
   Box,
   Alert,
-  CircularProgress,
   Card,
   CardContent,
-  Avatar,
   Divider,
   InputAdornment,
   IconButton
@@ -191,17 +188,6 @@ export default function LoginPage() {
                     </InputAdornment>
                   ),
                 }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#2563eb',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#2563eb',
-                    },
-                  },
-                }}
               />
 
               <TextField
@@ -228,22 +214,12 @@ export default function LoginPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
                         size="small"
+                        aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    '&:hover fieldset': {
-                      borderColor: '#2563eb',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: '#2563eb',
-                    },
-                  },
                 }}
               />
 

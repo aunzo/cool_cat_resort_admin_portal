@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from '@mui/material'
 import Button from '@/components/Button'
-import { Customer, CreateCustomerData, CustomerFormSchema } from '@/types/customer'
+import { Customer, CustomerFormSchema } from '@/types/customer'
 import { useCustomers } from '@/hooks/useCustomers'
 import { z } from 'zod'
 
@@ -140,13 +140,7 @@ export default function CustomerForm({ customerHook, editingCustomer, onEditComp
         </Alert>
       )}
       
-      {customerHook.error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {customerHook.error}
-        </Alert>
-      )}
-      
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box component="form" onSubmit={handleSubmit}>
         <TextField
           label="ชื่อ"
           value={formData.name}
@@ -156,6 +150,7 @@ export default function CustomerForm({ customerHook, editingCustomer, onEditComp
           disabled={isSubmitting}
           error={!!fieldErrors.name}
           helperText={fieldErrors.name}
+          margin="normal"
         />
         
         <TextField
@@ -169,6 +164,7 @@ export default function CustomerForm({ customerHook, editingCustomer, onEditComp
           disabled={isSubmitting}
           error={!!fieldErrors.address}
           helperText={fieldErrors.address}
+          margin="normal"
         />
         
         <TextField
@@ -180,6 +176,7 @@ export default function CustomerForm({ customerHook, editingCustomer, onEditComp
           disabled={isSubmitting}
           error={!!fieldErrors.taxId}
           helperText={fieldErrors.taxId}
+          margin="normal"
         />
         
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
@@ -187,13 +184,10 @@ export default function CustomerForm({ customerHook, editingCustomer, onEditComp
             type="submit"
             variant="contained"
             disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
             sx={{ flex: 1 }}
           >
-            {isSubmitting ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              editingCustomer ? 'อัปเดตลูกค้า' : 'เพิ่มลูกค้า'
-            )}
+            {isSubmitting ? 'กำลังบันทึก...' : (editingCustomer ? 'อัปเดตลูกค้า' : 'เพิ่มลูกค้า')}
           </Button>
           
           <Button
@@ -203,7 +197,7 @@ export default function CustomerForm({ customerHook, editingCustomer, onEditComp
             disabled={isSubmitting}
             sx={{ flex: 1 }}
           >
-ยกเลิก
+            {editingCustomer ? 'ยกเลิก' : 'ล้างข้อมูล'}
           </Button>
         </Box>
       </Box>

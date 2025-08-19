@@ -43,6 +43,63 @@ export async function PUT(
   try {
     const data: UpdateReservationData = await request.json()
     
+    // Check for room availability if dates or rooms are being updated
+    if (data.roomIds && data.checkInDate && data.checkOutDate) {
+      const checkInDate = new Date(data.checkInDate)
+      const checkOutDate = new Date(data.checkOutDate)
+      
+      // Find existing reservations that overlap with the requested dates
+      // Exclude the current reservation being updated
+      const conflictingReservations = await prisma.reservation.findMany({
+        where: {
+          id: {
+            not: params.id // Exclude current reservation
+          },
+          rooms: {
+            some: {
+              roomId: {
+                in: data.roomIds
+              }
+            }
+          },
+          AND: [
+            {
+              checkInDate: {
+                lt: checkOutDate // Existing check-in is before new check-out
+              }
+            },
+            {
+              checkOutDate: {
+                gt: checkInDate // Existing check-out is after new check-in
+              }
+            }
+          ]
+        },
+        include: {
+          rooms: {
+            include: {
+              room: true
+            }
+          }
+        }
+      })
+      
+      if (conflictingReservations.length > 0) {
+         const conflictingRooms = conflictingReservations
+           .flatMap(reservation => reservation.rooms)
+           .filter(reservationRoom => data.roomIds!.includes(reservationRoom.roomId))
+           .map(reservationRoom => reservationRoom.room?.name)
+           .filter((name, index, array) => array.indexOf(name) === index) // Remove duplicates
+        
+        return NextResponse.json(
+          { 
+            error: `ห้องพักต่อไปนี้ถูกจองแล้วในช่วงเวลาที่เลือก: ${conflictingRooms.join(', ')}` 
+          },
+          { status: 409 }
+        )
+      }
+    }
+    
     // Handle room updates if roomIds are provided
     const updateData: any = {
       customerId: data.customerId,

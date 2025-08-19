@@ -35,18 +35,28 @@ import {
   CalendarToday,
   AdminPanelSettings,
 } from '@mui/icons-material'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
-import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay'
+import { Calendar, dateFnsLocalizer, Event, View } from 'react-big-calendar'
+import { format, parse, startOfWeek, getDay } from 'date-fns'
+import { th } from 'date-fns/locale'
 import Link from 'next/link'
 import AppLayout from '@/app/components/AppLayout'
 import { useReservations } from '@/hooks/useReservations'
 import { useRooms } from '@/hooks/useRooms'
 import { useCustomers } from '@/hooks/useCustomers'
 import { ReservationWithDetails } from '@/types/reservation'
-import { isSameDay, parseISO, format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns'
+import { isSameDay, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts'
+
+// Setup the localizer for react-big-calendar
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales: {
+    'th': th,
+  },
+})
 
 export default function HomePage() {
   const { reservationsWithDetails, loading: reservationsLoading } = useReservations()
@@ -57,6 +67,7 @@ export default function HomePage() {
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null)
   const [modalOpen, setModalOpen] = React.useState(false)
   const [selectedDateReservations, setSelectedDateReservations] = React.useState<ReservationWithDetails[]>([])
+  const [calendarView, setCalendarView] = React.useState<View>('month')
   
   // Chart filter state
   const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear())
@@ -132,11 +143,20 @@ export default function HomePage() {
 
   const availableYears = getAvailableYears()
   
-  // Handle calendar day click
-  const handleDayClick = (date: Date) => {
+  // Handle calendar event click
+  const handleSelectEvent = (event: Event) => {
+    const date = event.start as Date
     const reservationsForDay = getReservationsForDate(date)
+    setSelectedDate(date)
+    setSelectedDateReservations(reservationsForDay)
+    setModalOpen(true)
+  }
+  
+  // Handle calendar slot click
+  const handleSelectSlot = ({ start }: { start: Date }) => {
+    const reservationsForDay = getReservationsForDate(start)
     if (reservationsForDay.length > 0) {
-      setSelectedDate(date)
+      setSelectedDate(start)
       setSelectedDateReservations(reservationsForDay)
       setModalOpen(true)
     }
@@ -151,61 +171,49 @@ export default function HomePage() {
 
   // Get reservations for a specific date
   const getReservationsForDate = (date: Date) => {
-    return reservationsWithDetails.filter(reservationsWithDetails => {
-      const checkIn = reservationsWithDetails.checkInDate
-      const checkOut = reservationsWithDetails.checkOutDate
+    return reservationsWithDetails.filter(reservation => {
+      const checkIn = reservation.checkInDate
+      const checkOut = reservation.checkOutDate
       if (!checkIn || !checkOut) return false
       
       const checkInDate = checkIn instanceof Date ? checkIn : new Date(checkIn)
       const checkOutDate = checkOut instanceof Date ? checkOut : new Date(checkOut)
       
-      return date >= checkInDate && date <= checkOutDate
+      // Check if the selected date falls within the reservation period
+      // Exclude check-out date (only show actual stay days)
+      const selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+      const startDate = new Date(checkInDate.getFullYear(), checkInDate.getMonth(), checkInDate.getDate())
+      const endDate = new Date(checkOutDate.getFullYear(), checkOutDate.getMonth(), checkOutDate.getDate())
+      
+      return selectedDate >= startDate && selectedDate < endDate
     })
   }
 
-  // Custom day component for calendar
-  const CustomDay = (props: PickersDayProps) => {
-    const { day, outsideCurrentMonth, ...other } = props
-    const reservationsForDay = getReservationsForDate(day)
-    const hasReservations = reservationsForDay.length > 0
-
-    if (outsideCurrentMonth) {
-      return <PickersDay {...other} day={day} outsideCurrentMonth={outsideCurrentMonth} />
-    }
-
-    return (
-      <Tooltip
-        title={
-          hasReservations
-            ? `${reservationsForDay.length} การจอง - คลิกเพื่อดูรายละเอียด`
-            : 'ไม่มีการจอง'
-        }
-        arrow
-      >
-        <Badge
-          badgeContent={hasReservations ? reservationsForDay.length : 0}
-          color="primary"
-          overlap="circular"
-        >
-          <PickersDay
-            {...other}
-            day={day}
-            outsideCurrentMonth={outsideCurrentMonth}
-            onClick={() => handleDayClick(day)}
-            sx={{
-              ...(hasReservations && {
-                backgroundColor: 'primary.light',
-                color: 'primary.contrastText',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'primary.main',
-                },
-              }),
-            }}
-          />
-        </Badge>
-      </Tooltip>
-    )
+  // Convert reservations to calendar events
+  const getCalendarEvents = (): Event[] => {
+    const events = reservationsWithDetails.map((reservation) => {
+      const checkInDate = reservation.checkInDate ? new Date(reservation.checkInDate) : new Date()
+      const checkOutDate = reservation.checkOutDate ? new Date(reservation.checkOutDate) : new Date()
+      
+      // Set check-in date to start of day
+      checkInDate.setHours(0, 0, 0, 0)
+      
+      // Set end date to the day before check-out (last day of actual stay)
+      const endDate = new Date(checkOutDate)
+      endDate.setDate(endDate.getDate() - 1)
+      endDate.setHours(23, 59, 59, 999)
+      
+      return {
+        id: reservation.id,
+        title: `${reservation.customer?.name || 'ลูกค้าที่ถูกลบ'} - ${reservation.rooms?.map(room => room.room?.name).join(', ') || 'ไม่มีข้อมูลห้อง'}`,
+        start: checkInDate,
+        end: endDate,
+        resource: reservation,
+        allDay: true,
+      }
+    })
+    
+    return events
   }
 
   return (
@@ -362,39 +370,50 @@ export default function HomePage() {
 
           {/* Calendar View */}
           <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
-              <Paper elevation={3} sx={{ p: 3, height: 500, overflow: 'auto' }}>
+            <Grid item xs={12}>
+              <Paper elevation={3} sx={{ p: 3, height: 820, overflow: 'auto' }}>
                 <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main', mb: 3 }}>
                   ปฏิทินการจอง
                 </Typography>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateCalendar
-                    slots={{
-                      day: CustomDay,
+                <Box sx={{ height: 700 }}>
+                  <Calendar
+                    localizer={localizer}
+                    events={getCalendarEvents()}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: '100%' }}
+                    onSelectEvent={handleSelectEvent}
+                    onSelectSlot={handleSelectSlot}
+                    selectable
+                    view={calendarView}
+                    onView={setCalendarView}
+                    views={['month', 'week', 'day', 'agenda']}
+                    culture="th"
+                    messages={{
+                      next: 'ถัดไป',
+                      previous: 'ก่อนหน้า',
+                      today: 'วันนี้',
+                      month: 'เดือน',
+                      week: 'สัปดาห์',
+                      day: 'วัน',
+                      agenda: 'รายการ',
+                      date: 'วันที่',
+                      time: 'เวลา',
+                      event: 'การจอง',
+                      noEventsInRange: 'ไม่มีการจองในช่วงนี้',
+                      showMore: (total) => `+${total} เพิ่มเติม`,
                     }}
-                    sx={{
-                      width: '100%',
-                      '& .MuiPickersCalendarHeader-root': {
-                        paddingLeft: 1,
-                        paddingRight: 1,
-                      },
-                      '& .MuiDayCalendar-root': {
-                        minHeight: 'auto',
-                      },
-                      '& .MuiPickersDay-root': {
-                        fontSize: '0.9rem',
-                        width: 36,
-                        height: 36,
-                        margin: '2px',
-                      },
-                    }}
+                    popup
                   />
-                </LocalizationProvider>
+                </Box>
               </Paper>
             </Grid>
-            
-            <Grid item xs={12} md={8}>
-              <Paper elevation={3} sx={{ p: 3, height: 500, overflow: 'auto' }}>
+          </Grid>
+
+          {/* Recent Reservations */}
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid item xs={12}>
+              <Paper elevation={3} sx={{ p: 3, height: 600, overflow: 'auto' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                   <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
                     การจองล่าสุด

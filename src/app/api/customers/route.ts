@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { CreateCustomerData, UpdateCustomerData } from '@/types/customer'
+import { CreateCustomerData } from '@/types/customer'
 
 export async function GET(request: NextRequest) {
   try {

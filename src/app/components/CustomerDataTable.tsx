@@ -20,14 +20,11 @@ import {
   IconButton,
   Typography,
   Box,
-  Alert,
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  useTheme,
-  useMediaQuery,
   Card,
   CardContent,
   Stack,
@@ -53,8 +50,6 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const { customers, loading, error } = customerHook
 
@@ -134,6 +129,7 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                   size="small"
                   onClick={() => handleEdit(customer)}
                   color="primary"
+                  aria-label="แก้ไขลูกค้า"
                 >
                   <EditIcon fontSize="small" />
                 </IconButton>
@@ -143,6 +139,7 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                   size="small"
                   onClick={() => handleDeleteClick(customer)}
                   color="error"
+                  aria-label="ลบลูกค้า"
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -182,16 +179,6 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
         <Typography variant="body2" sx={{ mt: 2 }}>
 กำลังโหลดลูกค้า...
         </Typography>
-      </Paper>
-    )
-  }
-
-  if (error) {
-    return (
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Alert severity="error">
-          {error}
-        </Alert>
       </Paper>
     )
   }
@@ -295,6 +282,7 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                   onClick={() => table.setPageIndex(0)}
                   disabled={!table.getCanPreviousPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="ไปหน้าแรก"
                 >
                   {'<<'}
                 </Button>
@@ -304,6 +292,7 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="หน้าก่อนหน้า"
                 >
                   {'<'}
                 </Button>
@@ -313,6 +302,7 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="หน้าถัดไป"
                 >
                   {'>'}
                 </Button>
@@ -322,6 +312,7 @@ export default function CustomerDataTable({ customerHook }: CustomerDataTablePro
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="ไปหน้าสุดท้าย"
                 >
                   {'>>'}
                 </Button>

@@ -10,10 +10,6 @@ import {
   useTheme,
   useMediaQuery,
   CircularProgress,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   SelectChangeEvent,
   Autocomplete,
   Dialog,
@@ -48,7 +44,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
     customerId: editingReservation?.customerId || '',
     roomIds: editingReservation?.rooms?.map(rr => rr.roomId) || [],
     checkInDate: editingReservation?.checkInDate ? new Date(editingReservation.checkInDate) : new Date(),
-    checkOutDate: editingReservation?.checkOutDate ? new Date(editingReservation.checkOutDate) : new Date(),
+    checkOutDate: editingReservation?.checkOutDate ? new Date(editingReservation.checkOutDate) : new Date(new Date().setDate(new Date().getDate() + 1)),
     totalAmount: editingReservation?.totalAmount || 0,
     extraBed: editingReservation?.extraBed || false,
     notes: editingReservation?.notes || '',
@@ -273,7 +269,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
         customerId: '',
         roomIds: [],
         checkInDate: new Date(),
-        checkOutDate: new Date(),
+        checkOutDate: new Date(new Date().setDate(new Date().getDate() + 1)),
         totalAmount: 0,
         extraBed: false,
         notes: '',
@@ -293,28 +289,33 @@ export default function ReservationForm({ reservationHook, editingReservation, o
     return date.toISOString().split('T')[0]
   }
 
+  const handleCancel = () => {
+    if (isEditing && onEditComplete) {
+      onEditComplete()
+    } else {
+      setFormData({
+        customerId: '',
+        roomIds: [],
+        checkInDate: new Date(),
+        checkOutDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+        totalAmount: 0,
+        extraBed: false,
+        notes: '',
+      })
+    }
+
+    setSelectedCustomer(null)
+    setSelectedRooms([])
+    setSubmitError(null)
+    setSubmitSuccess(false)
+  }
+
   return (
     <Box>
       {!isMobile ? (
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            p: 3, 
-            mb: 3
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            component="h2" 
-            gutterBottom
-            sx={{ 
-              fontWeight: 'bold',
-              color: theme.palette.primary.main,
-              textAlign: 'center',
-              mb: 3
-            }}
-          >
-  {isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+            {isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
           </Typography>
         
         <Box component="form" onSubmit={handleSubmit}>
@@ -363,6 +364,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                     }
                   }}
                   size="small"
+                  aria-label="เพิ่มลูกค้าใหม่"
                 >
                   <AddIcon />
                 </IconButton>
@@ -416,6 +418,23 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 error={!!errors.checkInDate}
                 helperText={errors.checkInDate}
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    cursor: 'pointer',
+                  },
+                  '& .MuiInputBase-input': {
+                    cursor: 'pointer',
+                    '&::-webkit-calendar-picker-indicator': {
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer',
+                    },
+                  },
+                }}
               />
             </Grid>
             
@@ -424,11 +443,28 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 fullWidth
                 type="date"
                 label="วันที่เช็คเอาท์"
-                value={formatDateForInput(formData.checkOutDate || new Date())}
+                value={formatDateForInput(formData.checkOutDate || new Date(new Date().setDate(new Date().getDate() + 1)))}
                 onChange={handleChange('checkOutDate')}
                 error={!!errors.checkOutDate}
                 helperText={errors.checkOutDate}
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    cursor: 'pointer',
+                  },
+                  '& .MuiInputBase-input': {
+                    cursor: 'pointer',
+                    '&::-webkit-calendar-picker-indicator': {
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer',
+                    },
+                  },
+                }}
               />
             </Grid>
             
@@ -472,7 +508,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
             </Alert>
           )}
           
-          <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
             <Button
               type="submit"
               variant="contained"
@@ -489,23 +525,22 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                 isEditing ? 'อัปเดตการจอง' : 'สร้างการจอง'
               )}
             </Button>
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+              sx={{ flex: 1 }}
+            >
+              {isEditing ? 'ยกเลิก' : 'ล้างข้อมูล'}
+            </Button>
           </Box>
         </Box>
       </Paper>
       ) : (
         <Box>
-          <Typography 
-            variant="h5" 
-            component="h2" 
-            gutterBottom
-            sx={{ 
-              fontWeight: 'bold',
-              color: theme.palette.primary.main,
-              textAlign: 'center',
-              mb: 3
-            }}
-          >
-  {isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
+          <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+            {isEditing ? 'แก้ไขการจอง' : 'เพิ่มการจองใหม่'}
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit}>
@@ -554,6 +589,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                        }
                      }}
                      size="small"
+                     aria-label="เพิ่มลูกค้าใหม่"
                    >
                      <AddIcon />
                    </IconButton>
@@ -607,6 +643,23 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                    error={!!errors.checkInDate}
                    helperText={errors.checkInDate}
                    InputLabelProps={{ shrink: true }}
+                   sx={{
+                     '& .MuiInputBase-root': {
+                       cursor: 'pointer',
+                     },
+                     '& .MuiInputBase-input': {
+                       cursor: 'pointer',
+                       '&::-webkit-calendar-picker-indicator': {
+                         position: 'absolute',
+                         left: 0,
+                         top: 0,
+                         width: '100%',
+                         height: '100%',
+                         opacity: 0,
+                         cursor: 'pointer',
+                       },
+                     },
+                   }}
                  />
                </Grid>
                
@@ -620,6 +673,23 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                    error={!!errors.checkOutDate}
                    helperText={errors.checkOutDate}
                    InputLabelProps={{ shrink: true }}
+                   sx={{
+                     '& .MuiInputBase-root': {
+                       cursor: 'pointer',
+                     },
+                     '& .MuiInputBase-input': {
+                       cursor: 'pointer',
+                       '&::-webkit-calendar-picker-indicator': {
+                         position: 'absolute',
+                         left: 0,
+                         top: 0,
+                         width: '100%',
+                         height: '100%',
+                         opacity: 0,
+                         cursor: 'pointer',
+                       },
+                     },
+                   }}
                  />
                </Grid>
                
@@ -663,7 +733,7 @@ export default function ReservationForm({ reservationHook, editingReservation, o
                </Alert>
              )}
              
-             <Box sx={{ mt: 3, textAlign: 'center' }}>
+             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
                <Button
                  type="submit"
                  variant="contained"

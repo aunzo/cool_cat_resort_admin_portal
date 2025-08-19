@@ -333,6 +333,7 @@ export default function AppLayout({ children, title = 'Cool Cat Resort - ระ�
                         backgroundColor: 'secondary.main',
                       },
                     }}
+                    aria-label="เมนูผู้ใช้"
                   >
                     <Avatar sx={{ width: 32, height: 32, bgcolor: 'transparent' }}>
                       {session.user.name?.charAt(0).toUpperCase()}

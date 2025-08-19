@@ -21,7 +21,6 @@ import {
   TextField,
   Typography,
   CircularProgress,
-  Alert,
   useTheme,
   useMediaQuery,
   Card,
@@ -162,6 +161,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   size="small"
                   color="primary"
                   onClick={() => handleViewReservation(reservation)}
+                  aria-label="ดูรายละเอียดการจอง"
                 >
                   <Visibility fontSize="small" />
                 </IconButton>
@@ -171,6 +171,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   size="small"
                   color="primary"
                   onClick={() => handleEditReservation(reservation)}
+                  aria-label="แก้ไขการจอง"
                 >
                   <Edit fontSize="small" />
                 </IconButton>
@@ -180,6 +181,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   size="small"
                   color="error"
                   onClick={() => handleDeleteClick(reservation)}
+                  aria-label="ลบการจอง"
                 >
                   <Delete fontSize="small" />
                 </IconButton>
@@ -225,17 +227,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
       </Paper>
     )
   }
-
-  if (error) {
-    return (
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Alert severity="error">
-          {error}
-        </Alert>
-      </Paper>
-    )
-  }
-
+  
   // Mobile card view
   const MobileView = () => (
     <Box sx={{ display: { xs: 'block', md: 'none' } }}>
@@ -298,6 +290,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                           size="medium"
                           color="primary"
                           onClick={() => handleViewReservation(reservation)}
+                          aria-label="ดูรายละเอียดการจอง"
                           sx={{
                             minHeight: 44,
                             borderRadius: 2,
@@ -313,6 +306,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                           size="medium"
                           color="secondary"
                           onClick={() => handleEditReservation(reservation)}
+                          aria-label="แก้ไขการจอง"
                           sx={{
                             minHeight: 44,
                             borderRadius: 2,
@@ -328,6 +322,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                           size="medium"
                           color="error"
                           onClick={() => handleDeleteClick(reservation)}
+                          aria-label="ลบการจอง"
                           sx={{
                             minHeight: 44,
                             borderRadius: 2,
@@ -373,6 +368,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   onClick={() => table.setPageIndex(0)}
                   disabled={!table.getCanPreviousPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="ไปหน้าแรก"
                 >
                   {'<<'}
                 </Button>
@@ -382,6 +378,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="หน้าก่อนหน้า"
                 >
                   {'<'}
                 </Button>
@@ -391,6 +388,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="หน้าถัดไป"
                 >
                   {'>'}
                 </Button>
@@ -400,6 +398,7 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
                   sx={{ minWidth: 48, minHeight: 48 }}
+                  aria-label="ไปหน้าสุดท้าย"
                 >
                   {'>>'}
                 </Button>
@@ -566,23 +565,13 @@ export default function ReservationDataTable({ reservationHook }: ReservationDat
         fullWidth
         fullScreen={isMobile}
       >
-        <DialogTitle>
-          แก้ไขการจอง {selectedReservation?.number ? `#${selectedReservation.number}` : ''}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <ReservationForm
+        <DialogContent sx={{ p: 0 }}>
+          <ReservationForm
               reservationHook={reservationHook}
               editingReservation={selectedReservation || undefined}
               onEditComplete={handleEditComplete}
             />
-          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>
-            ยกเลิก
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* View Reservation Dialog */}

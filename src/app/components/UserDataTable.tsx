@@ -21,7 +21,6 @@ import {
   TextField,
   Typography,
   CircularProgress,
-  Alert,
   Card,
   CardContent,
   Stack,
@@ -161,6 +160,7 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
                   size="small"
                   onClick={() => handleEdit(user)}
                   color="primary"
+                  aria-label="แก้ไขผู้ใช้"
                 >
                   <EditIcon fontSize="small" />
                 </IconButton>
@@ -170,6 +170,7 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
                   size="small"
                   onClick={() => handleDeleteClick(user)}
                   color="error"
+                  aria-label="ลบผู้ใช้"
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -209,16 +210,6 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
         <Typography variant="body2" sx={{ mt: 2 }}>
           กำลังโหลดผู้ใช้...
         </Typography>
-      </Paper>
-    )
-  }
-
-  if (error) {
-    return (
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <Alert severity="error">
-          {error}
-        </Alert>
       </Paper>
     )
   }
@@ -441,6 +432,7 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
                   size="small"
                   onClick={() => table.setPageIndex(0)}
                   disabled={!table.getCanPreviousPage()}
+                  aria-label="ไปหน้าแรก"
                 >
                   {'<<'}
                 </Button>
@@ -449,6 +441,7 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
                   size="small"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
+                  aria-label="หน้าก่อนหน้า"
                 >
                   {'<'}
                 </Button>
@@ -457,6 +450,7 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
                   size="small"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
+                  aria-label="หน้าถัดไป"
                 >
                   {'>'}
                 </Button>
@@ -465,6 +459,7 @@ export default function UserDataTable({ userHook }: UserDataTableProps) {
                   size="small"
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
+                  aria-label="ไปหน้าสุดท้าย"
                 >
                   {'>>'}
                 </Button>

@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* React Big Calendar Styles */
+@import 'react-big-calendar/lib/css/react-big-calendar.css';
+
+/* Custom styles for react-big-calendar */
+.rbc-calendar {
+  font-family: 'Roboto', sans-serif;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-header {
+  background-color: #1995AD;
+  color: white;
+  font-weight: 600;
+  padding: 12px 8px;
+  border: none;
+  text-align: center;
+}
+
+.rbc-today {
+  background-color: #E8F4F8;
+}
+
+.rbc-event {
+  background-color: #1995AD;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 11px;
+  padding: 3px 6px;
+  margin: 1px;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.rbc-event:hover {
+  background-color: #147A8A;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.rbc-selected {
+  background-color: #0F5F6B;
+}
+
+.rbc-month-view {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rbc-date-cell {
+  padding: 6px;
+  min-height: 40px;
+}
+
+.rbc-date-cell > a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.rbc-off-range-bg {
+  background-color: #f8f9fa;
+}
+
+.rbc-month-row {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.rbc-day-bg {
+  border-right: 1px solid #e0e0e0;
+}
+
+.rbc-day-bg:last-child {
+  border-right: none;
+}
+
+.rbc-toolbar {
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+.rbc-toolbar button {
+  background-color: #1995AD;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin: 0 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #147A8A;
+}
+
+.rbc-toolbar button:active,
+.rbc-toolbar button.rbc-active {
+  background-color: #0F5F6B;
+}
+
+.rbc-toolbar-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1995AD;
+  margin: 0 16px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .rbc-toolbar {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .rbc-toolbar button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .rbc-toolbar-label {
+    font-size: 16px;
+    margin: 0;
+  }
+  
+  .rbc-event {
+    font-size: 10px;
+    padding: 1px 2px;
+  }
+}

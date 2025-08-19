@@ -33,7 +33,7 @@ interface UserFormProps {
 
 const UserForm: React.FC<UserFormProps> = ({ userHook, user, onSuccess, onCancel }) => {
   const fallbackHook = useUsers()
-  const { createUser, updateUser, loading, error } = userHook || fallbackHook
+  const { createUser, updateUser, error } = userHook || fallbackHook
   const [formData, setFormData] = useState<UserFormData>({
     username: '',
     password: '',
@@ -178,6 +178,7 @@ const UserForm: React.FC<UserFormProps> = ({ userHook, user, onSuccess, onCancel
                 <IconButton
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
+                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
                 >
                   {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
@@ -216,19 +217,20 @@ const UserForm: React.FC<UserFormProps> = ({ userHook, user, onSuccess, onCancel
             variant="contained"
             disabled={isSubmitting}
             startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+            sx={{ flex: 1 }}
           >
-            {isSubmitting ? 'กำลังบันทึก...' : (user ? 'บันทึกการแก้ไข' : 'เพิ่มผู้ใช้')}
+            {isSubmitting ? 'กำลังบันทึก...' : (user ? 'อัปเดตผู้ใช้' : 'เพิ่มผู้ใช้')}
           </Button>
           
-          {onCancel && (
-            <Button
-              variant="outlined"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
-              ยกเลิก
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={onCancel}
+            disabled={isSubmitting}
+            sx={{ flex: 1 }}
+          >
+            {user ? 'ยกเลิก' : 'ล้างข้อมูล'}
+          </Button>
         </Box>
       </Box>
     </Paper>

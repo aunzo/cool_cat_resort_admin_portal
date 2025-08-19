@@ -6,6 +6,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import SessionProviderWrapper from '../components/SessionProviderWrapper'
 import theme from './theme'
+import './globals.css'
 
 const sarabun = Sarabun({ 
   subsets: ['latin', 'thai'],
